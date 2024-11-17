@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "Player/PNPlayerController.h"
+#include "Component/PNBattleSystemComponent.h"
 
 APNCharacter::APNCharacter()
 {
@@ -72,7 +73,17 @@ APNCharacter::APNCharacter()
 	{
 		MouseLeftAttackAction = MouseLeftAttackActionRef.Object;
 	}
-	
+	static ConstructorHelpers::FObjectFinder<UInputAction> MouseRightActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Attack.IA_Attack'"));
+	if (MouseRightActionRef.Object)
+	{
+		MouseRightAction = MouseRightActionRef.Object;
+	}
+
+
+	/* 사제 컴포넌트 */
+	BSComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System"));
+
+	CurrentBattleState = EBattleState::BSNonCombat;
 }
 
 void APNCharacter::BeginPlay()
@@ -93,7 +104,8 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APNCharacter::Move);
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &APNCharacter::Look);
-	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Triggered, this, &APNCharacter::MouseLeftAttack);
+	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseLeftAttack);
+	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Completed, this, &APNCharacter::MouseLeftAttackRelease);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -123,18 +135,25 @@ void APNCharacter::Look(const FInputActionValue& Value)
 	AddControllerYawInput(-InputValue.Y * 0.5f);
 }
 
-void APNCharacter::MouseLeftAttack(const FInputActionValue& Value)
+void APNCharacter::MouseLeftAttack()
 {
-	// Held Time 확인
-	float HeldTime = Value.Get<float>();
+	UE_LOG(LogTemp, Display, TEXT("클릭!"));
+	IsCharge = true;
+	BSComp->Charge();
 
-	if (HeldTime >= 2.0f) //차지 공격
+	if (CurrentBattleState == EBattleState::BSCombat)
 	{
+		BSComp->Attack();
 	}
-	else if (HeldTime >= 1.0f) //준차지 공격
-	{
-	}
-	else //Default Attack
-	{
-	}
+}
+
+void APNCharacter::MouseLeftAttackRelease()
+{
+	UE_LOG(LogTemp, Display, TEXT("땜!"));
+	IsCharge = false;
+}
+
+void APNCharacter::MouseRightAttack()
+{
+	BSComp->HeavyAttack();
 }

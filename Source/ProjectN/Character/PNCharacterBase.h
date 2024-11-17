@@ -9,8 +9,8 @@
 UENUM(BlueprintType)
 enum class EBattleState : uint8
 {
-	ECombat,
-	ENonCombat
+	BSCombat,
+	BSNonCombat
 };
 
 UCLASS()
