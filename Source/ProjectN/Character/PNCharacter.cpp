@@ -73,15 +73,21 @@ APNCharacter::APNCharacter()
 	{
 		MouseLeftAttackAction = MouseLeftAttackActionRef.Object;
 	}
-	static ConstructorHelpers::FObjectFinder<UInputAction> MouseRightActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Attack.IA_Attack'"));
-	if (MouseRightActionRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> MouseRightHeavyAttackActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Attack_Heavy.IA_Attack_Heavy'"));
+	if (MouseRightHeavyAttackActionRef.Object)
 	{
-		MouseRightAction = MouseRightActionRef.Object;
+		MouseRightHeavyAttackAction = MouseRightHeavyAttackActionRef.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> MouseLeftChargeAttackActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Attack_Charge.IA_Attack_Charge'"));
+	if (MouseLeftChargeAttackActionRef.Object)
+	{
+		MouseLeftChargeAttackAction = MouseLeftChargeAttackActionRef.Object;
 	}
 
-
+	
 	/* 사제 컴포넌트 */
 	BSComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System"));
+
 
 	CurrentBattleState = EBattleState::BSNonCombat;
 }
@@ -94,6 +100,23 @@ void APNCharacter::BeginPlay()
 	{
 		Subsystem->AddMappingContext(IMC_Comp, 0);
 	}
+
+}
+
+void APNCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//if (IsCharge)
+	//{
+	//	PressTime += DeltaTime;
+	//	if (PressTime >= 1.5f)
+	//	{
+	//		BSComp->Attack();
+	//		IsCharge = false;
+	//		PressTime = 0.f;
+	//	}
+	//}
 }
 
 void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -106,6 +129,8 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &APNCharacter::Look);
 	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseLeftAttack);
 	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Completed, this, &APNCharacter::MouseLeftAttackRelease);
+	EnhancedInput->BindAction(MouseLeftChargeAttackAction, ETriggerEvent::Triggered, this, &APNCharacter::MouseLeftChargeAttack);
+	EnhancedInput->BindAction(MouseRightHeavyAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseRightAttack);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -137,23 +162,27 @@ void APNCharacter::Look(const FInputActionValue& Value)
 
 void APNCharacter::MouseLeftAttack()
 {
-	UE_LOG(LogTemp, Display, TEXT("클릭!"));
 	IsCharge = true;
-	BSComp->Charge();
-
-	if (CurrentBattleState == EBattleState::BSCombat)
-	{
-		BSComp->Attack();
-	}
+	
+	BSComp->Attack();
 }
 
 void APNCharacter::MouseLeftAttackRelease()
 {
-	UE_LOG(LogTemp, Display, TEXT("땜!"));
 	IsCharge = false;
+
+	PressTime = 0.f;
+}
+
+void APNCharacter::MouseLeftChargeAttack()
+{
+	//PressTime * Damage 인자값 넘기기 고려
+	BSComp->ChargeAttack();
 }
 
 void APNCharacter::MouseRightAttack()
 {
 	BSComp->HeavyAttack();
 }
+
+

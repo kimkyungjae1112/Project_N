@@ -29,14 +29,45 @@ protected:
 
 public:
 	void Charge();
+	void EndCharge(class UAnimMontage* Target, bool IsProperlyEnded);
+
 	void Attack();
-	void ChargeAttack();
-	void LightAttack();
 	void HeavyAttack();
 
 	void SuccessCharge();
 	void FailCharge();
 
+	/* Light Attack */
+	void LightAttack();
+
+	/* Charge Attack */
+	void ChargeAttack();
+
+private:
+	/* Light Attack */
+	void EndLightAttack(class UAnimMontage* Target, bool IsProperlyEnded);
+	void SetTimerLightAttack();
+	void CheckTimerLightAttack();
+
+	int32 CurrentLightAttackCombo = 0;
+	bool HasNextLightAttack = false;
+	FTimerHandle LightAttackTimer;
+
+	/* Charge Attack */
+	void EndChargeAttack(class UAnimMontage* Target, bool IsProperlyEnded);
+
+
+	/* Heavy Attack */
+	void BeginHeavyAttack();
+	void EndHeavyAttack(class UAnimMontage* Target, bool IsProperlyEnded);
+	void SetTimerHeavyAttack();
+	void CheckTimerHeavyAttack();
+
+	int32 CurrentHeavyAttackCombo = 0;
+	bool HasNextHeavyAttack = false;
+	FTimerHandle HeavyAttackTimer;
+
+/* Utility */
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Utility")
 	TObjectPtr<class ACharacter> Player;
@@ -47,7 +78,21 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
 	EAttackState CurrentAttackState;
 
+	UPROPERTY(VisibleAnywhere, Category = "Combo")
+	TObjectPtr<class UPNCharacterComboDataAsset> ComboData;
+
+
+/* Montage */
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> ChargeMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> ChargeAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> HeavyAttackMontage;
 };

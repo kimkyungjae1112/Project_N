@@ -14,14 +14,17 @@ void UAttackStartNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 	Super::Notify(MeshComp, Animation, EventReference);
 
 	APNCharacter* Player = Cast<APNCharacter>(MeshComp->GetOwner());
-	if (Player->GetIsCharge())
+	if (Player)
 	{
-		UPNBattleSystemComponent* BSComp = Cast<UPNBattleSystemComponent>(Player->GetComponentByClass<UPNBattleSystemComponent>());
-		BSComp->SuccessCharge();
-	}
-	else
-	{
-		UPNBattleSystemComponent* BSComp = Cast<UPNBattleSystemComponent>(Player->GetComponentByClass<UPNBattleSystemComponent>());
-		BSComp->FailCharge();
+		if (Player->GetIsCharge())
+		{
+			UPNBattleSystemComponent* BSComp = Cast<UPNBattleSystemComponent>(Player->GetComponentByClass<UPNBattleSystemComponent>());
+			BSComp->SuccessCharge();
+		}
+		else
+		{
+			UPNBattleSystemComponent* BSComp = Cast<UPNBattleSystemComponent>(Player->GetComponentByClass<UPNBattleSystemComponent>());
+			BSComp->FailCharge();
+		}
 	}
 }

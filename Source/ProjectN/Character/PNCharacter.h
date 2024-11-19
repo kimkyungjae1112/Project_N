@@ -22,6 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 public:
@@ -44,6 +45,7 @@ private:
 	void Look(const FInputActionValue& Value);
 	void MouseLeftAttack();
 	void MouseLeftAttackRelease();
+	void MouseLeftChargeAttack();
 	void MouseRightAttack();
 
 	float PressTime = 0.f;
@@ -62,10 +64,13 @@ private:
 	TObjectPtr<class UInputAction> LookAction;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> MouseLeftAttackAction;
+	TObjectPtr<class UInputAction> MouseLeftChargeAttackAction;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> MouseRightAction;
+	TObjectPtr<class UInputAction> MouseRightHeavyAttackAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> MouseLeftAttackAction;
 
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
@@ -77,4 +82,5 @@ private:
 /* Battle System Component */
 	UPROPERTY(VisibleAnywhere, Category = "Battle System")
 	TObjectPtr<class UPNBattleSystemComponent> BSComp;
+
 };
