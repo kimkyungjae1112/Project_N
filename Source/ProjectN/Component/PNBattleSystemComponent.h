@@ -10,7 +10,6 @@ UENUM()
 enum class EAttackState : uint8
 {
 	ASIdle,
-	ASLeft,
 	ASLight,
 	ASHeavy,
 	ASCharge

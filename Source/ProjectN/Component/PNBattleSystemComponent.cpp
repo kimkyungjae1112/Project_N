@@ -15,7 +15,6 @@ UPNBattleSystemComponent::UPNBattleSystemComponent()
 		ComboData = ComboDataRef.Object;
 	}
 
-
 	CurrentAttackState = EAttackState::ASIdle;
 }
 
@@ -51,9 +50,10 @@ void UPNBattleSystemComponent::Attack()
 	switch (CurrentAttackState)
 	{
 	case EAttackState::ASIdle:
+		UE_LOG(LogTemp, Display, TEXT("Charge"));
 		Charge();
 		break;
-	case EAttackState::ASLeft:
+	case EAttackState::ASLight:
 		if (!LightAttackTimer.IsValid())
 			HasNextLightAttack = false;
 		else
@@ -66,10 +66,9 @@ void UPNBattleSystemComponent::HeavyAttack()
 {
 	if (CurrentLightAttackCombo == 1 || CurrentAttackState == EAttackState::ASHeavy)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Heavy Attack"));
 		CurrentAttackState = EAttackState::ASHeavy;
 
-		Anim->Montage_Stop(0.1f, AttackMontage);
+		//Anim->Montage_Stop(1.f, AttackMontage);
 		
 		if (CurrentHeavyAttackCombo == 0)
 		{
@@ -93,7 +92,7 @@ void UPNBattleSystemComponent::SuccessCharge()
 
 void UPNBattleSystemComponent::FailCharge()
 {
-	CurrentAttackState = EAttackState::ASLeft;
+	CurrentAttackState = EAttackState::ASLight;
 
 	Anim->Montage_Stop(0.1f, ChargeMontage);
 	LightAttack();
@@ -116,7 +115,7 @@ void UPNBattleSystemComponent::EndLightAttack(UAnimMontage* Target, bool IsPrope
 {
 	ensure(CurrentLightAttackCombo != 0);
 	CurrentLightAttackCombo = 0;
-	if (CurrentAttackState == EAttackState::ASLeft)
+	if (CurrentAttackState == EAttackState::ASLight)
 	{
 		CurrentAttackState = EAttackState::ASIdle;
 	}

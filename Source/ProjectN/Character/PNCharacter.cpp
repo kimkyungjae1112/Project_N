@@ -10,14 +10,15 @@
 #include "InputMappingContext.h"
 #include "Player/PNPlayerController.h"
 #include "Component/PNBattleSystemComponent.h"
+#include "Component/PNParkourComponent.h"
 
 APNCharacter::APNCharacter()
 {
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
@@ -83,10 +84,17 @@ APNCharacter::APNCharacter()
 	{
 		MouseLeftChargeAttackAction = MouseLeftChargeAttackActionRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> RunAndWalkActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_RunAndWalk.IA_RunAndWalk'"));
+	if (RunAndWalkActionRef.Object)
+	{
+		RunAndWalkAction = RunAndWalkActionRef.Object;
+	}
+
 
 	
 	/* 사제 컴포넌트 */
-	BSComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System"));
+	BSComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
+	ParkourComp = CreateDefaultSubobject<UPNParkourComponent>(TEXT("Parkour Component"));
 
 
 	CurrentBattleState = EBattleState::BSNonCombat;
@@ -131,6 +139,8 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Completed, this, &APNCharacter::MouseLeftAttackRelease);
 	EnhancedInput->BindAction(MouseLeftChargeAttackAction, ETriggerEvent::Triggered, this, &APNCharacter::MouseLeftChargeAttack);
 	EnhancedInput->BindAction(MouseRightHeavyAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseRightAttack);
+	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Triggered, this, &APNCharacter::Run);
+	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Completed, this, &APNCharacter::Walk);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -162,6 +172,7 @@ void APNCharacter::Look(const FInputActionValue& Value)
 
 void APNCharacter::MouseLeftAttack()
 {
+	UE_LOG(LogTemp, Display, TEXT("Left"));
 	IsCharge = true;
 	
 	BSComp->Attack();
@@ -183,6 +194,16 @@ void APNCharacter::MouseLeftChargeAttack()
 void APNCharacter::MouseRightAttack()
 {
 	BSComp->HeavyAttack();
+}
+
+void APNCharacter::Run()
+{
+	ParkourComp->Run();
+}
+
+void APNCharacter::Walk()
+{
+	ParkourComp->Walk();
 }
 
 

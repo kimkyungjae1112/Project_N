@@ -47,10 +47,13 @@ private:
 	void MouseLeftAttackRelease();
 	void MouseLeftChargeAttack();
 	void MouseRightAttack();
-
 	float PressTime = 0.f;
 	bool IsCharge = false;
 
+	void Run();
+	void Walk();
+
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
 	EBattleState CurrentBattleState;
 
@@ -72,6 +75,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> MouseLeftAttackAction;
 
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> RunAndWalkAction;
+
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> SwordMeshComp;
@@ -79,8 +85,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> SheathMeshComp;
 
-/* Battle System Component */
+/* Components */
 	UPROPERTY(VisibleAnywhere, Category = "Battle System")
 	TObjectPtr<class UPNBattleSystemComponent> BSComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Parkour System")
+	TObjectPtr<class UPNParkourComponent> ParkourComp;
 };
