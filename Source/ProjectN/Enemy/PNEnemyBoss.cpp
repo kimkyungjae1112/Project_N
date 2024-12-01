@@ -56,6 +56,12 @@ APNAIControllerBase* APNEnemyBoss::GetAIController()
 	return GetMyController();
 }
 
+void APNEnemyBoss::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
+{
+	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
+
+}
+
 void APNEnemyBoss::BeginAttack_1_Default()
 {
 	Anim->Montage_Play(Attack_1_Montage);

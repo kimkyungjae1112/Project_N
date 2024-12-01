@@ -27,6 +27,7 @@ public:
 	
 public:
 	FORCEINLINE bool GetIsCharge() { return IsCharge; }
+	FORCEINLINE USkeletalMeshComponent* GetWeapon() { return SwordMeshComp; }
 
 public:
 	class APNPlayerController* GetMyController();

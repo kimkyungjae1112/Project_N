@@ -31,3 +31,7 @@ APNAIControllerBase* APNEnemyBase::GetAIController()
 {
 	return Cast<APNAIControllerBase>(GetController());
 }
+
+void APNEnemyBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
+{
+}

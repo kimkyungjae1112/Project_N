@@ -34,7 +34,7 @@ APNCharacter::APNCharacter()
 
 	SwordMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Sword"));
 	SwordMeshComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SwordMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/ARPG_Samurai/Demo/Weapon/Mesh/katana.katana'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SwordMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/DARK_C_KNIGHT/MESHES/WEAPONS/SWORD/SK_DC_Knight_Sword.SK_DC_Knight_Sword'"));
 	if (SwordMeshRef.Object)
 	{
 		SwordMeshComp->SetSkeletalMesh(SwordMeshRef.Object);
@@ -115,16 +115,19 @@ void APNCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (IsCharge)
-	//{
-	//	PressTime += DeltaTime;
-	//	if (PressTime >= 1.5f)
-	//	{
-	//		BSComp->Attack();
-	//		IsCharge = false;
-	//		PressTime = 0.f;
-	//	}
-	//}
+	/*FVector StartLoc = GetWeapon()->GetSocketLocation(TEXT("SwordBoneStart"));
+	FVector EndLoc = GetWeapon()->GetSocketLocation(TEXT("SwordBoneEnd"));
+	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params(NAME_None, true, this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel2, Params);
+	if (bHit)
+	{
+		UE_LOG(LogTemp, Display, TEXT("닿음?"));
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Red, false, 3.f);
+	}*/
 }
 
 void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -172,7 +175,6 @@ void APNCharacter::Look(const FInputActionValue& Value)
 
 void APNCharacter::MouseLeftAttack()
 {
-	UE_LOG(LogTemp, Display, TEXT("Left"));
 	IsCharge = true;
 	
 	BSComp->Attack();

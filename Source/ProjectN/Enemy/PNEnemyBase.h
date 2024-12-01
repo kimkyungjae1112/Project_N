@@ -5,17 +5,19 @@
 #include "CoreMinimal.h"
 #include "Character/PNCharacterBase.h"
 #include "Interface/AIInterface.h"
+#include "Interface/EnemyApplyDamageInterface.h"
 #include "PNEnemyBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTN_API APNEnemyBase : public APNCharacterBase, public IAIInterface
+class PROJECTN_API APNEnemyBase : public APNCharacterBase, public IAIInterface, public IEnemyApplyDamageInterface
 {
 	GENERATED_BODY()
 
 public:
+	/* AI Interface */
 	virtual float GetMeleeAttackInRange() override;
 	virtual void Attack_1() override;
 	virtual void Attack_2() override;
@@ -24,6 +26,10 @@ public:
 	virtual void SetAttack_2_Delegate(const FOnAttack_2_Finished& InOnAttack_2_Finished);
 
 	virtual class APNAIControllerBase* GetAIController() override;
+	
+
+	/* 대미지 전달 */
+	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
 
 protected:
 	FOnAttack_1_Finished OnAttack_1_Finished;

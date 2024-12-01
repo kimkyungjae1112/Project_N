@@ -6,9 +6,12 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Character/PNCharacterComboDataAsset.h"
+#include "Interface/EnemyApplyDamageInterface.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
+	PrimaryComponentTick.bCanEverTick = true;
+
 	static ConstructorHelpers::FObjectFinder<UPNCharacterComboDataAsset> ComboDataRef(TEXT("/Script/ProjectN.PNCharacterComboDataAsset'/Game/Project_N/Data/Character/DA_ComboAttack.DA_ComboAttack'"));
 	if (ComboDataRef.Object)
 	{
@@ -26,6 +29,12 @@ void UPNBattleSystemComponent::BeginPlay()
 	Player = CastChecked<ACharacter>(GetOwner());
 	Anim = Player->GetMesh()->GetAnimInstance();
 	ensure(Anim);
+}
+
+void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 }
 
 void UPNBattleSystemComponent::Charge()
@@ -50,7 +59,6 @@ void UPNBattleSystemComponent::Attack()
 	switch (CurrentAttackState)
 	{
 	case EAttackState::ASIdle:
-		UE_LOG(LogTemp, Display, TEXT("Charge"));
 		Charge();
 		break;
 	case EAttackState::ASLight:
@@ -66,10 +74,9 @@ void UPNBattleSystemComponent::HeavyAttack()
 {
 	if (CurrentLightAttackCombo == 1 || CurrentAttackState == EAttackState::ASHeavy)
 	{
+
 		CurrentAttackState = EAttackState::ASHeavy;
 
-		//Anim->Montage_Stop(1.f, AttackMontage);
-		
 		if (CurrentHeavyAttackCombo == 0)
 		{
 			BeginHeavyAttack();
@@ -205,4 +212,3 @@ void UPNBattleSystemComponent::CheckTimerHeavyAttack()
 		HasNextHeavyAttack = false;
 	}
 }
-

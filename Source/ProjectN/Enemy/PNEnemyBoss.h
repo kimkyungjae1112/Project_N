@@ -20,13 +20,17 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-/* AI Interface */
 public:
+	/* AI Interface */
 	virtual float GetMeleeAttackInRange() override;
 	virtual void Attack_1() override;
 	virtual void Attack_2() override;
 
 	virtual class APNAIControllerBase* GetAIController();
+
+	/* 대미지 전달 */
+	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
+
 
 private:
 	void BeginAttack_1_Default();

@@ -27,12 +27,16 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void Charge();
-	void EndCharge(class UAnimMontage* Target, bool IsProperlyEnded);
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+/* 공격 */
+public:
+	/* 좌클릭 눌렀을 때 실행되는 함수 */
 	void Attack();
+	/* 우클릭 눌렀을 때 실행되는 함수 */
 	void HeavyAttack();
 
+	/* 좌클릭 처음 눌렀을 때 계속 누르고 있는지 판별 */
 	void SuccessCharge();
 	void FailCharge();
 
@@ -41,8 +45,12 @@ public:
 
 	/* Charge Attack */
 	void ChargeAttack();
-
+	
 private:
+	/* 차징 */
+	void Charge();
+	void EndCharge(class UAnimMontage* Target, bool IsProperlyEnded);
+
 	/* Light Attack */
 	void EndLightAttack(class UAnimMontage* Target, bool IsProperlyEnded);
 	void SetTimerLightAttack();
@@ -65,6 +73,7 @@ private:
 	int32 CurrentHeavyAttackCombo = 0;
 	bool HasNextHeavyAttack = false;
 	FTimerHandle HeavyAttackTimer;
+
 
 /* Utility */
 private:
