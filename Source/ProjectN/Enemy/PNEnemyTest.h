@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enemy/PNEnemyBase.h"
+#include "Enemy/PNEnemyCommonBase.h"
 #include "PNEnemyTest.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTN_API APNEnemyTest : public APNEnemyBase
+class PROJECTN_API APNEnemyTest : public APNEnemyCommonBase
 {
 	GENERATED_BODY()
 
