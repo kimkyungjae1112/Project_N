@@ -11,6 +11,7 @@
 #include "Player/PNPlayerController.h"
 #include "Component/PNBattleSystemComponent.h"
 #include "Component/PNParkourComponent.h"
+#include "MotionWarpingComponent.h"
 
 APNCharacter::APNCharacter()
 {
@@ -89,13 +90,27 @@ APNCharacter::APNCharacter()
 	{
 		RunAndWalkAction = RunAndWalkActionRef.Object;
 	}
-
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Jump.IA_Jump'"));
+	if (JumpActionRef.Object)
+	{
+		JumpAction = JumpActionRef.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> CrouchActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Crouch.IA_Crouch'"));
+	if (CrouchActionRef.Object)
+	{
+		CrouchAction = CrouchActionRef.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> RollActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Roll.IA_Roll'"));
+	if (RollActionRef.Object)
+	{
+		RollAction = RollActionRef.Object;
+	}
 
 	
 	/* 사제 컴포넌트 */
-	BSComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
+	BattleSystemComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
 	ParkourComp = CreateDefaultSubobject<UPNParkourComponent>(TEXT("Parkour Component"));
-
+	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarp Component"));
 
 	CurrentBattleState = EBattleState::BSNonCombat;
 }
@@ -109,25 +124,6 @@ void APNCharacter::BeginPlay()
 		Subsystem->AddMappingContext(IMC_Comp, 0);
 	}
 
-}
-
-void APNCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	/*FVector StartLoc = GetWeapon()->GetSocketLocation(TEXT("SwordBoneStart"));
-	FVector EndLoc = GetWeapon()->GetSocketLocation(TEXT("SwordBoneEnd"));
-	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params(NAME_None, true, this);
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel2, Params);
-	if (bHit)
-	{
-		UE_LOG(LogTemp, Display, TEXT("닿음?"));
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Red, false, 3.f);
-	}*/
 }
 
 void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -144,6 +140,11 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(MouseRightHeavyAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseRightAttack);
 	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Triggered, this, &APNCharacter::Run);
 	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Completed, this, &APNCharacter::Walk);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &APNCharacter::Crouch);
+	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APNCharacter::UnCrouch);
+	EnhancedInput->BindAction(RollAction, ETriggerEvent::Started, this, &APNCharacter::Roll);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -177,25 +178,22 @@ void APNCharacter::MouseLeftAttack()
 {
 	IsCharge = true;
 	
-	BSComp->Attack();
+	BattleSystemComp->Attack();
 }
 
 void APNCharacter::MouseLeftAttackRelease()
 {
 	IsCharge = false;
-
-	PressTime = 0.f;
 }
 
 void APNCharacter::MouseLeftChargeAttack()
 {
-	//PressTime * Damage 인자값 넘기기 고려
-	BSComp->ChargeAttack();
+	BattleSystemComp->ChargeAttack();
 }
 
 void APNCharacter::MouseRightAttack()
 {
-	BSComp->HeavyAttack();
+	BattleSystemComp->HeavyAttack();
 }
 
 void APNCharacter::Run()
@@ -206,6 +204,21 @@ void APNCharacter::Run()
 void APNCharacter::Walk()
 {
 	ParkourComp->Walk();
+}
+
+void APNCharacter::Crouch()
+{
+	ParkourComp->Crouch();
+}
+
+void APNCharacter::UnCrouch()
+{
+	ParkourComp->UnCrouch();
+}
+
+void APNCharacter::Roll()
+{
+	ParkourComp->BeginRoll();
 }
 
 

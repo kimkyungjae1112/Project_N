@@ -22,7 +22,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 public:
@@ -53,7 +52,9 @@ private:
 
 	void Run();
 	void Walk();
-
+	void Crouch();
+	void UnCrouch();
+	void Roll();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
 	EBattleState CurrentBattleState;
@@ -79,6 +80,15 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> RunAndWalkAction;
 
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> JumpAction;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> CrouchAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> RollAction;
+
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> SwordMeshComp;
@@ -88,8 +98,11 @@ private:
 
 /* Components */
 	UPROPERTY(VisibleAnywhere, Category = "Battle System")
-	TObjectPtr<class UPNBattleSystemComponent> BSComp;
+	TObjectPtr<class UPNBattleSystemComponent> BattleSystemComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Parkour System")
 	TObjectPtr<class UPNParkourComponent> ParkourComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Motion Warp")
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpComp;
 };

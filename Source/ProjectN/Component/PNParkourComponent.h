@@ -24,8 +24,23 @@ public:
 	void Run();
 	void Walk();
 
+	void Crouch();
+	void UnCrouch();
+
+	void BeginRoll();
+	void EndRoll(class UAnimMontage* Target, bool IsProperlyEnded);
+	void RollMotionWarpSet();
+
+/* 캐릭터 */
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Character")
 	TObjectPtr<class ACharacter> Character;
 
+	UPROPERTY(VisibleAnywhere, Category = "Character")
+	TObjectPtr<class UAnimInstance> Anim;
+
+/* 몽타주 */
+private:
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> RollMontage;
 };
