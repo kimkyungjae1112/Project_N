@@ -4,6 +4,11 @@
 #include "Enemy/PNEnemyBase.h"
 #include "AI/Controller/PNAIControllerBase.h"
 
+APNEnemyBase::APNEnemyBase()
+{
+	StatComp = CreateDefaultSubobject<UPNEnemyStatComponent>(TEXT("Stat Component"));
+}
+
 float APNEnemyBase::GetMeleeAttackInRange()
 {
 	return 350.0f;

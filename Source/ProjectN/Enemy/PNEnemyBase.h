@@ -6,6 +6,7 @@
 #include "Character/PNCharacterBase.h"
 #include "Interface/AIInterface.h"
 #include "Interface/EnemyApplyDamageInterface.h"
+#include "Component/PNEnemyStatComponent.h"
 #include "PNEnemyBase.generated.h"
 
 /**
@@ -15,6 +16,9 @@ UCLASS()
 class PROJECTN_API APNEnemyBase : public APNCharacterBase, public IAIInterface, public IEnemyApplyDamageInterface
 {
 	GENERATED_BODY()
+
+public:
+	APNEnemyBase();
 
 public:
 	/* AI Interface */
@@ -34,4 +38,7 @@ public:
 protected:
 	FOnAttack_1_Finished OnAttack_1_Finished;
 	FOnAttack_2_Finished OnAttack_2_Finished;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stat")
+	TObjectPtr<class UPNEnemyStatComponent> StatComp;
 };

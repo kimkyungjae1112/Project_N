@@ -25,9 +25,18 @@ public:
 	virtual void SetHpBar(class UEnemyHpBarWidget* InHpBar) override;
 
 private:
+	void DisplayDamageTextUI(float Damage);
+
+private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<class UEnemyRefWidgetComponent> HpBarWidgetComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UEnemyRefWidgetComponent> DamageTextWidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TSubclassOf<class UEnemyRefWidget> HpBarClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> DamagedTextClass;
 };

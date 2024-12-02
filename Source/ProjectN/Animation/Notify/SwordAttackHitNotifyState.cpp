@@ -38,12 +38,12 @@ void USwordAttackHitNotifyState::MakeLineTrace(APNCharacter* Character)
 
 		FHitResult HitResult;
 		FCollisionQueryParams Params(NAME_None, true, Character);
+		DrawDebugLine(Character->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
 
 		bool bHit = Character->GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel2, Params);
 		if (bHit && !HitEnemys.Contains(HitResult.GetActor()))
 		{
-			DrawDebugLine(Character->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
-			DrawDebugSphere(Character->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Red, false, 3.f);
+			DrawDebugSphere(Character->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
 			HitEnemys.Add(HitResult.GetActor());
 		
 			if (IEnemyApplyDamageInterface* Enemy = Cast<IEnemyApplyDamageInterface>(HitResult.GetActor()))

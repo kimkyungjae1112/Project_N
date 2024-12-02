@@ -12,13 +12,15 @@ APNEnemyTest::APNEnemyTest()
 	NiagaraComp->SetupAttachment(GetMesh());
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
+
 }
 
 void APNEnemyTest::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
-	UE_LOG(LogTemp, Display, TEXT("공격 받음"));
 	NiagaraComp->SetRelativeLocation(ImpactLocation);
 	NiagaraComp->Activate();
+
+	StatComp->ApplyDamage(DamageAmount);
 }

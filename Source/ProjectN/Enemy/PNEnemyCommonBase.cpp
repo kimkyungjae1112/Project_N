@@ -4,6 +4,7 @@
 #include "Enemy/PNEnemyCommonBase.h"
 #include "UI/EnemyRefWidgetComponent.h"
 #include "UI/EnemyHpBarWidget.h"
+#include "UI/DamageTextWidget.h"
 
 APNEnemyCommonBase::APNEnemyCommonBase()
 {
@@ -20,17 +21,45 @@ APNEnemyCommonBase::APNEnemyCommonBase()
 		HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	DamageTextWidgetComponent = CreateDefaultSubobject<UEnemyRefWidgetComponent>(TEXT("DamageTextWidgetComponent"));
+	DamageTextWidgetComponent->SetupAttachment(GetMesh());
+	DamageTextWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 220.f));
+	static ConstructorHelpers::FClassFinder<UDamageTextWidget> DamagedTextClassRef(TEXT("/Game/Project_N/UI/WBP_DamageText.WBP_DamageText_C"));
+	if (DamagedTextClassRef.Class)
+	{
+		DamagedTextClass = DamagedTextClassRef.Class;
+		DamageTextWidgetComponent->SetWidgetClass(DamagedTextClass);
+		DamageTextWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		DamageTextWidgetComponent->SetDrawSize(FVector2D(5.f, 5.f));
+		DamageTextWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+
 }
 
 void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
+	DisplayDamageTextUI(DamageAmount);
 
 }
 
 void APNEnemyCommonBase::SetHpBar(UEnemyHpBarWidget* InHpBar)
 {
-	InHpBar->SetMaxHp(1.f);
-	InHpBar->UpdateHpBar(1.f);
+	if (InHpBar)
+	{
+		InHpBar->SetMaxHp(StatComp->GetMaxHp());
+		InHpBar->UpdateHpBar(StatComp->GetHp());
+		StatComp->OnHpChanged.AddUObject(InHpBar, &UEnemyHpBarWidget::UpdateHpBar);
+	}
+}
+
+void APNEnemyCommonBase::DisplayDamageTextUI(float Damage)
+{
+	UDamageTextWidget* DamageText = Cast<UDamageTextWidget>(DamageTextWidgetComponent->GetWidget());
+	if (DamageText)
+	{
+		DamageText->SetDamageText(FString::Printf(TEXT("%.0f"), Damage));
+	}
 }
