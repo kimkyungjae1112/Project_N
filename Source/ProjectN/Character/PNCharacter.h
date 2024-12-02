@@ -7,6 +7,26 @@
 #include "InputActionValue.h"
 #include "PNCharacter.generated.h"
 
+DECLARE_DELEGATE(FChangeBehaviorState)
+
+UENUM(BlueprintType)
+enum class EBehaviorState : uint8
+{
+	EWalk = 0,
+	ERun,
+	ECrouch
+};
+
+USTRUCT()
+struct FChangeBehaviorStateWarpper //상태 변화
+{
+	GENERATED_BODY()
+
+	FChangeBehaviorStateWarpper() {}
+	FChangeBehaviorStateWarpper(const FChangeBehaviorState& ChagneBehaviorState) : ChangeBehaviorState(ChagneBehaviorState) { }
+
+	FChangeBehaviorState ChangeBehaviorState;
+};
 /**
  * 
  */
@@ -39,6 +59,16 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<class UCameraComponent> CameraComp;
 
+/* Change Behavior State */
+private:
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	TMap<EBehaviorState, FChangeBehaviorStateWarpper> ChangeBehaviorStateMap;
+
+	void SetBehaviorState(const EBehaviorState& BehaviorState);
+	void SetBehaviorStateWalk();
+	void SetBehaviorStateRun();
+	void SetBehaviorStateCrouch();
+
 /* Input System */
 private:
 	void Move(const FInputActionValue& Value);
@@ -52,15 +82,17 @@ private:
 
 	void Run();
 	void Walk();
-	void Crouch();
+	void OnCrouch();
 	void UnCrouch();
 	void Roll();
-	
+	void DashAttack();
+	void Assassination();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
-	EBattleState CurrentBattleState;
+	EBehaviorState CurrentBehaviorState;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
-	TObjectPtr<class UInputMappingContext> IMC_Comp;
+	TMap<EBehaviorState, class UInputMappingContext*> IMC;
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> MoveAction;
@@ -88,6 +120,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> RollAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> DashAttackAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> AssassinationAction;
 
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")

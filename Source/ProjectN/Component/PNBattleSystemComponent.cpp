@@ -7,6 +7,7 @@
 #include "Animation/AnimMontage.h"
 #include "Character/PNCharacterComboDataAsset.h"
 #include "Interface/EnemyApplyDamageInterface.h"
+#include "Blueprint/UserWidget.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
@@ -29,12 +30,29 @@ void UPNBattleSystemComponent::BeginPlay()
 	Player = CastChecked<ACharacter>(GetOwner());
 	Anim = Player->GetMesh()->GetAnimInstance();
 	ensure(Anim);
+
+	AssassinationUI = CreateWidget(GetWorld(), AssassinationUIClass);
 }
 
 void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	DetectEnemyForAssassination();
+	if (bCanAssassination)
+	{
+		if (AssassinationUI && !AssassinationUI->IsInViewport())
+		{
+			AssassinationUI->AddToViewport();
+		}
+	}
+	else
+	{
+		if (AssassinationUI->IsInViewport())
+		{
+			AssassinationUI->RemoveFromViewport();
+		}
+	}
 }
 
 void UPNBattleSystemComponent::Charge()
@@ -162,11 +180,70 @@ void UPNBattleSystemComponent::ChargeAttack()
 	Anim->Montage_SetEndDelegate(MontageEnd, ChargeAttackMontage);
 }
 
+void UPNBattleSystemComponent::BeginDashAttack()
+{
+	if (bIsDashAttacking) return;
+	bIsDashAttacking = true;
+	Anim->Montage_Play(DashAttackMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndDashAttack);
+	Anim->Montage_SetEndDelegate(MontageEnd, DashAttackMontage);
+}
+
+void UPNBattleSystemComponent::BeginAssassinationAttack()
+{
+	if (!bCanAssassination) return;
+	Anim->Montage_Play(AssassinationMontage);
+}
+
 void UPNBattleSystemComponent::EndChargeAttack(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	CurrentAttackState = EAttackState::ASIdle;
 }
 
+void UPNBattleSystemComponent::EndDashAttack(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	bIsDashAttacking = false;
+	InitBehaviorState.Broadcast();
+}
+
+void UPNBattleSystemComponent::DetectEnemyForAssassination()
+{
+	if (MakeSweepTrace())
+	{
+		UE_LOG(LogTemp, Display, TEXT("성공?"));
+		bCanAssassination = true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("실패?"));
+		bCanAssassination = false;
+	}
+}
+
+bool UPNBattleSystemComponent::MakeSweepTrace()
+{
+	float Range = 300.f;
+	FVector Origin = Player->GetActorLocation() + FVector(0.f, 0.f, Player->BaseEyeHeight);
+	FVector End = Origin + Player->GetActorForwardVector() * Range;
+	FQuat Quat = FRotationMatrix::MakeFromZ(End).ToQuat();
+	FVector CapsuleExtent = FVector(10.f, 50.f, 10.f);
+
+	FCollisionQueryParams Params(NAME_None, false, Player);
+
+	// 캡슐의 중심 위치
+	FVector CapsuleCenter = (Origin + End) / 2.f;
+
+	// 캡슐 반지름과 반높이
+	float CapsuleRadius = CapsuleExtent.Y; // Y축이 반지름
+	float CapsuleHalfHeight = Range / 2.f + CapsuleExtent.Z; // Z축이 반높이
+
+	// 캡슐을 그리기
+	DrawDebugCapsule(GetWorld(), CapsuleCenter, CapsuleHalfHeight, CapsuleRadius, Quat, FColor::Blue, false);
+
+	return GetWorld()->SweepSingleByChannel(AssassinationedResult, Origin, End, Quat, ECC_GameTraceChannel2, FCollisionShape::MakeCapsule(CapsuleExtent), Params);
+}
 
 void UPNBattleSystemComponent::BeginHeavyAttack()
 {

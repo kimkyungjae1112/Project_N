@@ -18,7 +18,7 @@ APNCharacter::APNCharacter()
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
-
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
@@ -55,11 +55,26 @@ APNCharacter::APNCharacter()
 		GetMesh()->SetSkeletalMesh(MainMeshRef.Object);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_CompRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_Player.IMC_Player'"));
-	if (IMC_CompRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_WalkRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_Walk.IMC_Walk'"));
+	if (IMC_WalkRef.Object)
 	{
-		IMC_Comp = IMC_CompRef.Object;
+		IMC.Add(EBehaviorState::EWalk, IMC_WalkRef.Object);
 	}
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_RunRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_Run.IMC_Run'"));
+	if (IMC_RunRef.Object)
+	{
+		IMC.Add(EBehaviorState::ERun, IMC_RunRef.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_CrouchRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_Crouch.IMC_Crouch'"));
+	if (IMC_CrouchRef.Object)
+	{
+		IMC.Add(EBehaviorState::ECrouch, IMC_CrouchRef.Object);
+	}
+	ChangeBehaviorStateMap.Add(EBehaviorState::EWalk, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateWalk)));
+	ChangeBehaviorStateMap.Add(EBehaviorState::ERun, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateRun)));
+	ChangeBehaviorStateMap.Add(EBehaviorState::ECrouch, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateCrouch)));
+
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Move.IA_Move'"));
 	if (MoveActionRef.Object)
 	{
@@ -105,25 +120,33 @@ APNCharacter::APNCharacter()
 	{
 		RollAction = RollActionRef.Object;
 	}
-
+	static ConstructorHelpers::FObjectFinder<UInputAction> DashAttackActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_DashAttack.IA_DashAttack'"));
+	if (DashAttackActionRef.Object)
+	{
+		DashAttackAction = DashAttackActionRef.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> AssassinationActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Assassination.IA_Assassination'"));
+	if (AssassinationActionRef.Object)
+	{
+		AssassinationAction = AssassinationActionRef.Object;
+	}
 	
 	/* 사제 컴포넌트 */
 	BattleSystemComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
 	ParkourComp = CreateDefaultSubobject<UPNParkourComponent>(TEXT("Parkour Component"));
 	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarp Component"));
 
-	CurrentBattleState = EBattleState::BSNonCombat;
+	/* 델리게이트 */
+	BattleSystemComp->InitBehaviorState.AddUObject(this, &APNCharacter::Walk);
+
+	CurrentBehaviorState = EBehaviorState::EWalk;
 }
 
 void APNCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
-	{
-		Subsystem->AddMappingContext(IMC_Comp, 0);
-	}
-
+	SetBehaviorState(CurrentBehaviorState);
 }
 
 void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -138,18 +161,58 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(MouseLeftAttackAction, ETriggerEvent::Completed, this, &APNCharacter::MouseLeftAttackRelease);
 	EnhancedInput->BindAction(MouseLeftChargeAttackAction, ETriggerEvent::Triggered, this, &APNCharacter::MouseLeftChargeAttack);
 	EnhancedInput->BindAction(MouseRightHeavyAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseRightAttack);
-	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Triggered, this, &APNCharacter::Run);
+	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Started, this, &APNCharacter::Run);
 	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Completed, this, &APNCharacter::Walk);
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &APNCharacter::Crouch);
+	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &APNCharacter::OnCrouch);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APNCharacter::UnCrouch);
 	EnhancedInput->BindAction(RollAction, ETriggerEvent::Started, this, &APNCharacter::Roll);
+	EnhancedInput->BindAction(DashAttackAction, ETriggerEvent::Started, this, &APNCharacter::DashAttack);
+	EnhancedInput->BindAction(AssassinationAction, ETriggerEvent::Started, this, &APNCharacter::Assassination);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
 {
 	return CastChecked<APNPlayerController>(GetController());
+}
+
+void APNCharacter::SetBehaviorState(const EBehaviorState& BehaviorState)
+{
+	ChangeBehaviorStateMap[BehaviorState].ChangeBehaviorState.ExecuteIfBound();
+}
+
+void APNCharacter::SetBehaviorStateWalk()
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Walk"));
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
+		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
+	}
+}
+
+void APNCharacter::SetBehaviorStateRun()
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Run"));
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
+		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
+	}
+}
+
+void APNCharacter::SetBehaviorStateCrouch()
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
+	{
+		UE_LOG(LogTemp, Display, TEXT("Crouch"));
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
+		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
+	}
 }
 
 void APNCharacter::Move(const FInputActionValue& Value)
@@ -198,27 +261,45 @@ void APNCharacter::MouseRightAttack()
 
 void APNCharacter::Run()
 {
+	CurrentBehaviorState = EBehaviorState::ERun;
+	SetBehaviorState(CurrentBehaviorState);
 	ParkourComp->Run();
 }
 
 void APNCharacter::Walk()
 {
+	CurrentBehaviorState = EBehaviorState::EWalk;
+	SetBehaviorState(CurrentBehaviorState);
 	ParkourComp->Walk();
 }
 
-void APNCharacter::Crouch()
+void APNCharacter::OnCrouch()
 {
+	CurrentBehaviorState = EBehaviorState::ECrouch;
+	SetBehaviorState(CurrentBehaviorState);
 	ParkourComp->Crouch();
 }
 
 void APNCharacter::UnCrouch()
 {
+	CurrentBehaviorState = EBehaviorState::EWalk;
+	SetBehaviorState(CurrentBehaviorState);
 	ParkourComp->UnCrouch();
 }
 
 void APNCharacter::Roll()
 {
 	ParkourComp->BeginRoll();
+}
+
+void APNCharacter::DashAttack()
+{
+	BattleSystemComp->BeginDashAttack();
+}
+
+void APNCharacter::Assassination()
+{
+	BattleSystemComp->BeginAssassinationAttack();
 }
 
 

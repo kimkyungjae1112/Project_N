@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "PNBattleSystemComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FInitBehaviorState)
+
 UENUM()
 enum class EAttackState : uint8
 {
@@ -29,6 +31,8 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	FInitBehaviorState InitBehaviorState;
+
 /* 공격 */
 public:
 	/* 좌클릭 눌렀을 때 실행되는 함수 */
@@ -45,6 +49,12 @@ public:
 
 	/* Charge Attack */
 	void ChargeAttack();
+
+	/* Dash Attack */
+	void BeginDashAttack();
+
+	/* Assassination Attack */
+	void BeginAssassinationAttack();
 	
 private:
 	/* 차징 */
@@ -63,6 +73,15 @@ private:
 	/* Charge Attack */
 	void EndChargeAttack(class UAnimMontage* Target, bool IsProperlyEnded);
 
+	/* Dash Attack */
+	void EndDashAttack(class UAnimMontage* Target, bool IsProperlyEnded);
+	bool bIsDashAttacking = false;
+
+	/* Assassination Attack */
+	void DetectEnemyForAssassination();
+	bool MakeSweepTrace();
+	bool bCanAssassination = false;
+	FHitResult AssassinationedResult;
 
 	/* Heavy Attack */
 	void BeginHeavyAttack();
@@ -74,6 +93,14 @@ private:
 	bool HasNextHeavyAttack = false;
 	FTimerHandle HeavyAttackTimer;
 
+
+/* UI */
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UUserWidget> AssassinationUI;
+	
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> AssassinationUIClass;
 
 /* Utility */
 private:
@@ -103,4 +130,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> HeavyAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> DashAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> AssassinationMontage;
 };
