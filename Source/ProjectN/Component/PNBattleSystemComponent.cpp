@@ -215,7 +215,19 @@ void UPNBattleSystemComponent::DetectEnemyForAssassination()
 {
 	if (MakeSweepTrace())
 	{
-		bCanAssassination = true;
+		AActor* TargetEnemy = AssassinationedResult.GetActor();
+		FVector TargetOrigin = TargetEnemy->GetActorLocation();
+		FVector TargetForward = TargetEnemy->GetActorForwardVector();
+
+		FVector PlayerForward = Player->GetActorForwardVector();
+
+
+		//구현 보류 잘 안됨 지금 2024 12 03
+		double CosineValue = FMath::Cos(FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(TargetForward, PlayerForward))));
+		if (CosineValue > 0.f && CosineValue <= 1.f)
+		{
+			bCanAssassination = true;
+		}
 	}
 	else
 	{
@@ -243,7 +255,7 @@ void UPNBattleSystemComponent::AssassinationMotionWarpSet()
 
 	FVector TargetOrigin = TargetEnemy->GetActorLocation();
 	FVector TargetForward = TargetEnemy->GetActorForwardVector();
-	FVector TargetLoc = TargetOrigin + (-TargetForward * 200.f);
+	FVector TargetLoc = TargetOrigin + (-TargetForward * 150.f);
 	
 	Player->GetComponentByClass<UMotionWarpingComponent>()->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Assassination"), TargetLoc, TargetForward.Rotation());
 }

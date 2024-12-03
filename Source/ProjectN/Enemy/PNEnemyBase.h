@@ -23,6 +23,8 @@ public:
 public:
 	/* AI Interface */
 	virtual float GetMeleeAttackInRange() override;
+	virtual float GetDetectRadius() override;
+
 	virtual void Attack_1() override;
 	virtual void Attack_2() override;
 

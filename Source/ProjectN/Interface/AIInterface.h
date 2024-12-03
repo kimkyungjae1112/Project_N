@@ -24,7 +24,7 @@ class PROJECTN_API IAIInterface
 
 public:
 	virtual float GetMeleeAttackInRange() = 0;
-
+	virtual float GetDetectRadius() = 0;
 
 	virtual void Attack_1() = 0;
 	virtual void Attack_2() = 0;

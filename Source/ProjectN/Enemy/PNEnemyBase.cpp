@@ -14,6 +14,11 @@ float APNEnemyBase::GetMeleeAttackInRange()
 	return 350.0f;
 }
 
+float APNEnemyBase::GetDetectRadius()
+{
+	return 1000.0f;
+}
+
 void APNEnemyBase::Attack_1()
 {
 }
