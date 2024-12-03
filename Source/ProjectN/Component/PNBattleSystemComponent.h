@@ -78,8 +78,9 @@ private:
 	bool bIsDashAttacking = false;
 
 	/* Assassination Attack */
-	void DetectEnemyForAssassination();
+	void DetectEnemyForAssassination();	//MakeSweepTrace 값에 따라 bCanAssassination 플래그 변경
 	bool MakeSweepTrace();
+	void AssassinationMotionWarpSet();
 	bool bCanAssassination = false;
 	FHitResult AssassinationedResult;
 

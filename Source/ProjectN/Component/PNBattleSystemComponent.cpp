@@ -8,6 +8,7 @@
 #include "Character/PNCharacterComboDataAsset.h"
 #include "Interface/EnemyApplyDamageInterface.h"
 #include "Blueprint/UserWidget.h"
+#include "MotionWarpingComponent.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
@@ -194,6 +195,8 @@ void UPNBattleSystemComponent::BeginDashAttack()
 void UPNBattleSystemComponent::BeginAssassinationAttack()
 {
 	if (!bCanAssassination) return;
+
+	AssassinationMotionWarpSet();
 	Anim->Montage_Play(AssassinationMontage);
 }
 
@@ -212,12 +215,10 @@ void UPNBattleSystemComponent::DetectEnemyForAssassination()
 {
 	if (MakeSweepTrace())
 	{
-		UE_LOG(LogTemp, Display, TEXT("성공?"));
 		bCanAssassination = true;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("실패?"));
 		bCanAssassination = false;
 	}
 }
@@ -232,17 +233,19 @@ bool UPNBattleSystemComponent::MakeSweepTrace()
 
 	FCollisionQueryParams Params(NAME_None, false, Player);
 
-	// 캡슐의 중심 위치
-	FVector CapsuleCenter = (Origin + End) / 2.f;
-
-	// 캡슐 반지름과 반높이
-	float CapsuleRadius = CapsuleExtent.Y; // Y축이 반지름
-	float CapsuleHalfHeight = Range / 2.f + CapsuleExtent.Z; // Z축이 반높이
-
-	// 캡슐을 그리기
-	DrawDebugCapsule(GetWorld(), CapsuleCenter, CapsuleHalfHeight, CapsuleRadius, Quat, FColor::Blue, false);
-
 	return GetWorld()->SweepSingleByChannel(AssassinationedResult, Origin, End, Quat, ECC_GameTraceChannel2, FCollisionShape::MakeCapsule(CapsuleExtent), Params);
+}
+
+void UPNBattleSystemComponent::AssassinationMotionWarpSet()
+{
+	AActor* TargetEnemy = AssassinationedResult.GetActor();
+	if (!TargetEnemy) return;
+
+	FVector TargetOrigin = TargetEnemy->GetActorLocation();
+	FVector TargetForward = TargetEnemy->GetActorForwardVector();
+	FVector TargetLoc = TargetOrigin + (-TargetForward * 200.f);
+	
+	Player->GetComponentByClass<UMotionWarpingComponent>()->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Assassination"), TargetLoc, TargetForward.Rotation());
 }
 
 void UPNBattleSystemComponent::BeginHeavyAttack()
