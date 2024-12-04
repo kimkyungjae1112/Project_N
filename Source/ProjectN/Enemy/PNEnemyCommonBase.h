@@ -21,6 +21,8 @@ public:
 	/* 대미지 전달 */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
 
+	virtual void NextComboAttack() override;
+
 	/* UI */
 	virtual void SetHpBar(class UEnemyHpBarWidget* InHpBar) override;
 

@@ -3,6 +3,8 @@
 
 #include "Animation/Notify/RampageDefaultAttackNotifyState.h"
 #include "GameFramework/Character.h"
+#include "Engine/OverlapResult.h"
+#include "Interface/AIInterface.h"
 
 URampageDefaultAttackNotifyState::URampageDefaultAttackNotifyState()
 {
@@ -30,6 +32,14 @@ void URampageDefaultAttackNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCom
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
 	HitTarget.Empty();
+	if (CanComboAttack(MeshComp->GetOwner()))
+	{
+		IAIInterface* Interface = Cast<IAIInterface>(MeshComp->GetOwner());
+		if (Interface)
+		{
+			Interface->NextComboAttack();
+		}
+	}
 }
 
 void URampageDefaultAttackNotifyState::MakeSphereTrace(ACharacter* Character)
@@ -42,19 +52,29 @@ void URampageDefaultAttackNotifyState::MakeSphereTrace(ACharacter* Character)
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, true, Character);
+	float BoxExtent = 25.f;
 
-	bool bLeftHandHit = Character->GetWorld()->SweepSingleByChannel(HitResult, LeftHandLoc, LeftHandLoc, LeftHandRot.Quaternion(), ECC_GameTraceChannel1, FCollisionShape::MakeBox(FVector(100.f)), Params);
-	bool bRightHandHit = Character->GetWorld()->SweepSingleByChannel(HitResult, RightHandLoc, RightHandLoc, RightHandRot.Quaternion(), ECC_GameTraceChannel1, FCollisionShape::MakeBox(FVector(100.f)), Params);
+	bool bLeftHandHit = Character->GetWorld()->SweepSingleByChannel(HitResult, LeftHandLoc, LeftHandLoc, LeftHandRot.Quaternion(), ECC_GameTraceChannel1, FCollisionShape::MakeBox(FVector(BoxExtent)), Params);
+	bool bRightHandHit = Character->GetWorld()->SweepSingleByChannel(HitResult, RightHandLoc, RightHandLoc, RightHandRot.Quaternion(), ECC_GameTraceChannel1, FCollisionShape::MakeBox(FVector(BoxExtent)), Params);
 
-	DrawDebugBox(Character->GetWorld(), LeftHandLoc, FVector(100.f), FColor::Red, false);
-	DrawDebugBox(Character->GetWorld(), RightHandLoc, FVector(100.f), FColor::Red, false);
+	DrawDebugBox(Character->GetWorld(), LeftHandLoc, FVector(), FColor::Red, false);
+	DrawDebugBox(Character->GetWorld(), RightHandLoc, FVector(), FColor::Red, false);
 
 	if ((bLeftHandHit || bRightHandHit) && !HitTarget.Contains(HitResult.GetActor()))  
 	{
 		HitTarget.Add(HitResult.GetActor());
 
-		UE_LOG(LogTemp, Display, TEXT("공격됨?"));
 		DrawDebugSphere(Character->GetWorld(), HitResult.ImpactPoint, 16.f, 32, FColor::Green, false, 3.f);
 	}
+}
 
+bool URampageDefaultAttackNotifyState::CanComboAttack(AActor* Owner)
+{
+	FVector Origin = Owner->GetActorLocation();
+	float Radius = 300.f;
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams Params(NAME_None, true, Owner);
+
+	return Owner->GetWorld()->OverlapMultiByChannel(OverlapResults, Origin, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(Radius), Params);
 }

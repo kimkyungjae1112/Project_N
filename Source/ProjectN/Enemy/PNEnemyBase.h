@@ -28,11 +28,12 @@ public:
 	virtual void Attack_1() override;
 	virtual void Attack_2() override;
 
-	virtual void SetAttack_1_Delegate(const FOnAttack_1_Finished& InOnAttack_1_Finished);
-	virtual void SetAttack_2_Delegate(const FOnAttack_2_Finished& InOnAttack_2_Finished);
+	virtual void SetAttack_1_Delegate(const FOnAttack_1_Finished& InOnAttack_1_Finished) override;
+	virtual void SetAttack_2_Delegate(const FOnAttack_2_Finished& InOnAttack_2_Finished) override;
 
 	virtual class APNAIControllerBase* GetAIController() override;
 	
+	virtual void NextComboAttack() override;
 
 	/* 대미지 전달 */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;

@@ -45,6 +45,10 @@ void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, c
 
 }
 
+void APNEnemyCommonBase::NextComboAttack()
+{
+}
+
 void APNEnemyCommonBase::SetHpBar(UEnemyHpBarWidget* InHpBar)
 {
 	if (InHpBar)

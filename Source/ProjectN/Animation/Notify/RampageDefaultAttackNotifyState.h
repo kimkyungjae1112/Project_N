@@ -23,6 +23,7 @@ public:
 
 private:
 	void MakeSphereTrace(class ACharacter* Character);
+	bool CanComboAttack(AActor* Owner);
 
 	UPROPERTY()
 	TSet<AActor*> HitTarget;

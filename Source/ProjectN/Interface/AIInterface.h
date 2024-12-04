@@ -33,4 +33,6 @@ public:
 	virtual void SetAttack_2_Delegate(const FOnAttack_2_Finished& InOnAttack_2_Finished) = 0;
 
 	virtual class APNAIControllerBase* GetAIController() = 0;
+
+	virtual void NextComboAttack() = 0;
 };

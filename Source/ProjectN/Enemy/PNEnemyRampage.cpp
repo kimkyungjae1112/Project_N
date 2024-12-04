@@ -20,14 +20,14 @@ APNEnemyRampage::APNEnemyRampage()
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 
 
-	DefaultAttackRange = 300.f;
+	DefaultAttackCombo = 0;
 }
 
 float APNEnemyRampage::GetMeleeAttackInRange()
 {
 	Super::GetMeleeAttackInRange();
 
-	return DefaultAttackRange;
+	return 300.f;
 }
 
 void APNEnemyRampage::Attack_1()
@@ -46,6 +46,19 @@ void APNEnemyRampage::Attack_2()
 APNAIControllerBase* APNEnemyRampage::GetAIController()
 {
 	return GetMyController();
+}
+
+void APNEnemyRampage::NextComboAttack()
+{
+	Super::NextComboAttack();
+
+	DefaultAttackCombo = FMath::Clamp(DefaultAttackCombo + 1, 0, 3);
+	UE_LOG(LogTemp, Display, TEXT("DefaultAttackCombo %d"), DefaultAttackCombo);
+
+	FName NextSection = *FString::Printf(TEXT("%s%d"), TEXT("Combo"), DefaultAttackCombo);
+	UE_LOG(LogTemp, Display, TEXT("%s"), *NextSection.ToString());
+	//왜 Combo3 은 실행이 안되냐?
+	Anim->Montage_JumpToSection(NextSection, DefaultAttackMontage);
 }
 
 void APNEnemyRampage::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
@@ -69,6 +82,8 @@ APNAIControllerRampage* APNEnemyRampage::GetMyController()
 
 void APNEnemyRampage::BeginDefaultAttack()
 {
+	UE_LOG(LogTemp, Display, TEXT("Attack 실행"));
+	DefaultAttackCombo = 1;
 	Anim->Montage_Play(DefaultAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -78,5 +93,6 @@ void APNEnemyRampage::BeginDefaultAttack()
 
 void APNEnemyRampage::EndDefaultAttack(UAnimMontage* Target, bool IsProperlyEnded)
 {
+	DefaultAttackCombo = 0;
 	OnAttack_1_Finished.ExecuteIfBound();
 }

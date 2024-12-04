@@ -4,18 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/PNEnemyCommonBase.h"
-#include "PNEnemyRampage.generated.h"
+#include "Interface/WeaponSocketCarryInterface.h"
+#include "PNEnemySkeleton.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTN_API APNEnemyRampage : public APNEnemyCommonBase
+class PROJECTN_API APNEnemySkeleton : public APNEnemyCommonBase, public IWeaponSocketCarryInterface
 {
 	GENERATED_BODY()
 	
 public:
-	APNEnemyRampage();
+	APNEnemySkeleton();
 
 	/* AI Interface */
 	virtual float GetMeleeAttackInRange() override;
@@ -29,13 +30,22 @@ public:
 	/* 대미지 전달 */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
 
+	/* Weapon Socket Interface */
+	virtual USkeletalMeshComponent* GetWeaponMeshComponent() override;
+
 protected:
 	virtual void BeginPlay() override;
 
 
+/* 메쉬 */
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	TObjectPtr<class USkeletalMeshComponent> WeaponMeshComp;
+
+
 /* 유틸리티 */
 private:
-	class APNAIControllerRampage* GetMyController();
+	class APNAIControllerSkeleton* GetMyController();
 
 	UPROPERTY(VisibleAnywhere, Category = "Util")
 	TObjectPtr<class UAnimInstance> Anim;
