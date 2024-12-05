@@ -25,7 +25,7 @@ APNEnemySkeleton::APNEnemySkeleton()
 	}
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
-	GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	GetCharacterMovement()->MaxWalkSpeed = 150.f;
 
 	DefaultAttackCombo = 0;
 }
@@ -62,6 +62,18 @@ void APNEnemySkeleton::ApplyDamage(float DamageAmount, AActor* DamageCauser, con
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
 	StatComp->ApplyDamage(DamageAmount);
+}
+
+void APNEnemySkeleton::SetDead()
+{
+	Super::SetDead();
+
+	GetMyController()->StopAI();
+
+	Anim->StopAllMontages(0.5f);
+	Anim->Montage_Play(DeadMontage);
+
+	SetActorEnableCollision(false);
 }
 
 USkeletalMeshComponent* APNEnemySkeleton::GetWeaponMeshComponent()

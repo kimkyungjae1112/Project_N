@@ -68,6 +68,10 @@ void APNEnemyRampage::ApplyDamage(float DamageAmount, AActor* DamageCauser, cons
 	StatComp->ApplyDamage(DamageAmount);
 }
 
+void APNEnemyRampage::SetDead()
+{
+}
+
 void APNEnemyRampage::BeginPlay()
 {
 	Super::BeginPlay();

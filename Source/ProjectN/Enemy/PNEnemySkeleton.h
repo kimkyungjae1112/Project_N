@@ -7,6 +7,47 @@
 #include "Interface/WeaponSocketCarryInterface.h"
 #include "PNEnemySkeleton.generated.h"
 
+UENUM()
+enum class EWeaponType : uint8
+{
+	Sword = 0,
+	Axe,
+	Spear
+};
+
+USTRUCT()
+struct FSwordAnimMontage
+{
+	GENERATED_BODY()
+
+	FSwordAnimMontage() {}
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> Montages;
+};
+
+USTRUCT()
+struct FAxeAnimMontage
+{
+	GENERATED_BODY()
+
+	FAxeAnimMontage() {}
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> Montages;
+};
+
+USTRUCT()
+struct FSpearAnimMontage
+{
+	GENERATED_BODY()
+
+	FSpearAnimMontage() {}
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> Montages;
+};
+
 /**
  * 
  */
@@ -27,8 +68,10 @@ public:
 
 	virtual void NextComboAttack() override;
 
-	/* 대미지 전달 */
+	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
+
+	virtual void SetDead() override;
 
 	/* Weapon Socket Interface */
 	virtual USkeletalMeshComponent* GetWeaponMeshComponent() override;
@@ -50,6 +93,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Util")
 	TObjectPtr<class UAnimInstance> Anim;
 
+	UPROPERTY(EditAnywhere, Category = "WeaponType")
+	EWeaponType WeaponType;
+
 /* 공격 */
 private:
 	void BeginDefaultAttack();
@@ -62,5 +108,6 @@ private:
 /* 몽타주 */
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage")
-	TObjectPtr<class UAnimMontage> DefaultAttackMontage;
+	TMap<EWeaponType, FSwordAnimMontage> Montage;
+
 };

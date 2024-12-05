@@ -18,13 +18,15 @@ class PROJECTN_API APNEnemyCommonBase : public APNEnemyBase, public IEnemyCommon
 public:
 	APNEnemyCommonBase();
 
-	/* 대미지 전달 */
-	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
-
 	virtual void NextComboAttack() override;
 
-	/* UI */
+	/* EnemyApplyDamage Interface */
+	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
+
+	/* EnemyCommonHpBar Interface */
 	virtual void SetHpBar(class UEnemyHpBarWidget* InHpBar) override;
+
+	virtual void SetDead() override { }
 
 private:
 	void DisplayDamageTextUI(float Damage);

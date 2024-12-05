@@ -62,6 +62,10 @@ void APNEnemyBoss::ApplyDamage(float DamageAmount, AActor* DamageCauser, const F
 
 }
 
+void APNEnemyBoss::SetDead()
+{
+}
+
 void APNEnemyBoss::BeginAttack_1_Default()
 {
 	Anim->Montage_Play(Attack_1_Montage);

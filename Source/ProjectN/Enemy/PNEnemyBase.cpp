@@ -7,6 +7,7 @@
 APNEnemyBase::APNEnemyBase()
 {
 	StatComp = CreateDefaultSubobject<UPNEnemyStatComponent>(TEXT("Stat Component"));
+	StatComp->OnHpZero.AddUObject(this, &APNEnemyBase::SetDead);
 }
 
 float APNEnemyBase::GetMeleeAttackInRange()
@@ -48,4 +49,9 @@ void APNEnemyBase::NextComboAttack()
 
 void APNEnemyBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
 {
+}
+
+void APNEnemyBase::SetDead()
+{
+	GetAIController()->StopAI();
 }

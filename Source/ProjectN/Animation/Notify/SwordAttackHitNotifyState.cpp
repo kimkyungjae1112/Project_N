@@ -48,7 +48,7 @@ void USwordAttackHitNotifyState::MakeLineTrace(APNCharacter* Character)
 		
 			if (IEnemyApplyDamageInterface* Enemy = Cast<IEnemyApplyDamageInterface>(HitResult.GetActor()))
 			{
-				Enemy->ApplyDamage(100.f, Character, TEXT("Default"), HitResult.ImpactPoint);
+				Enemy->ApplyDamage(500.f, Character, TEXT("Default"), HitResult.ImpactPoint);
 			}
 		}
 	}

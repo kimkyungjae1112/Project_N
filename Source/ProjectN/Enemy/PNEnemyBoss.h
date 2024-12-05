@@ -28,9 +28,10 @@ public:
 
 	virtual class APNAIControllerBase* GetAIController();
 
-	/* 대미지 전달 */
+	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
 
+	virtual void SetDead() override;
 
 private:
 	void BeginAttack_1_Default();
