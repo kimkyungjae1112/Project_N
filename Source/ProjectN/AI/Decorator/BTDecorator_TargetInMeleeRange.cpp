@@ -25,6 +25,6 @@ bool UBTDecorator_TargetInMeleeRange::CalculateRawConditionValue(UBehaviorTreeCo
 	if (Interface == nullptr) return false;
 
 	float Distance = FVector::Distance(Owner->GetActorLocation(), Target->GetActorLocation());
-	UE_LOG(LogTemp, Display, TEXT("Distance : %f"), Distance);
+	//UE_LOG(LogTemp, Display, TEXT("Distance : %f"), Distance);
 	return Interface->GetMeleeAttackInRange() >= Distance;
 }

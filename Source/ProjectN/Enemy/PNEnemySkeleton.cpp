@@ -32,7 +32,11 @@ APNEnemySkeleton::APNEnemySkeleton()
 
 float APNEnemySkeleton::GetMeleeAttackInRange()
 {
-	return 300.0f;
+	if (WeaponType == EWeaponType::Spear)
+	{
+		return 600.f;
+	}
+	return 300.f;
 }
 
 void APNEnemySkeleton::Attack_1()
@@ -71,7 +75,7 @@ void APNEnemySkeleton::SetDead()
 	GetMyController()->StopAI();
 
 	Anim->StopAllMontages(0.5f);
-	Anim->Montage_Play(DeadMontage);
+	Anim->Montage_Play(CurrentWeaponMontages[1]);
 
 	SetActorEnableCollision(false);
 }
@@ -86,6 +90,19 @@ void APNEnemySkeleton::BeginPlay()
 	Super::BeginPlay();
 
 	Anim = GetMesh()->GetAnimInstance();
+
+	switch (WeaponType)
+	{
+	case EWeaponType::Sword:
+		CurrentWeaponMontages = SwordMontages;
+		break;
+	case EWeaponType::Axe:
+		CurrentWeaponMontages = AxeMontages;
+		break;
+	case EWeaponType::Spear:
+		CurrentWeaponMontages = SpearMontages;
+		break;
+	}
 }
 
 APNAIControllerSkeleton* APNEnemySkeleton::GetMyController()
@@ -95,11 +112,11 @@ APNAIControllerSkeleton* APNEnemySkeleton::GetMyController()
 
 void APNEnemySkeleton::BeginDefaultAttack()
 {
-	Anim->Montage_Play(DefaultAttackMontage);
+	Anim->Montage_Play(CurrentWeaponMontages[0]);
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &APNEnemySkeleton::EndDefaultAttack);
-	Anim->Montage_SetEndDelegate(MontageEnd, DefaultAttackMontage);
+	Anim->Montage_SetEndDelegate(MontageEnd, CurrentWeaponMontages[0]);
 }
 
 void APNEnemySkeleton::EndDefaultAttack(UAnimMontage* Target, bool IsProperlyEnded)

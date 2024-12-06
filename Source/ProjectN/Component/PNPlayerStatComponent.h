@@ -27,6 +27,7 @@ public:
 	FOnHpZero OnHpZero;
 
 	FORCEINLINE float GetMaxHp() const { return MaxHp; }
+	FORCEINLINE float GetHp() const { return Hp; }
 		
 public:
 	void ApplyDamage(float InDamage);

@@ -3,6 +3,9 @@
 
 #include "Animation/Notify/SkeletonDefaultAttackNotifyState.h"
 #include "Interface/WeaponSocketCarryInterface.h"
+#include "Interface/AIInterface.h"
+#include "Engine/DamageEvents.h"
+#include "AI/Controller/PNAIControllerBase.h"
 
 USkeletonDefaultAttackNotifyState::USkeletonDefaultAttackNotifyState()
 {
@@ -31,7 +34,8 @@ void USkeletonDefaultAttackNotifyState::NotifyEnd(USkeletalMeshComponent* MeshCo
 void USkeletonDefaultAttackNotifyState::MakeLineTrace(AActor* Target)
 {
 	IWeaponSocketCarryInterface* Interface = Cast<IWeaponSocketCarryInterface>(Target);
-	if (Interface)
+	IAIInterface* AIInteface = Cast<IAIInterface>(Target);
+	if (Interface && AIInteface)
 	{
 		USkeletalMeshComponent* WeaponComp = Interface->GetWeaponMeshComponent();
 		if (WeaponComp)
@@ -48,6 +52,8 @@ void USkeletonDefaultAttackNotifyState::MakeLineTrace(AActor* Target)
 			{
 				HitTarget.Add(HitResult.GetActor());
 
+				FDamageEvent DamageEvent;
+				HitResult.GetActor()->TakeDamage(100.f, DamageEvent, AIInteface->GetAIController(), Target);
 				DrawDebugSphere(Target->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
 			}
 		}

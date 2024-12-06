@@ -15,42 +15,6 @@ enum class EWeaponType : uint8
 	Spear
 };
 
-USTRUCT()
-struct FSwordAnimMontage
-{
-	GENERATED_BODY()
-
-	FSwordAnimMontage() {}
-
-	UPROPERTY(EditAnywhere, Category = "Montage")
-	TArray<class UAnimMontage*> Montages;
-};
-
-USTRUCT()
-struct FAxeAnimMontage
-{
-	GENERATED_BODY()
-
-	FAxeAnimMontage() {}
-
-	UPROPERTY(EditAnywhere, Category = "Montage")
-	TArray<class UAnimMontage*> Montages;
-};
-
-USTRUCT()
-struct FSpearAnimMontage
-{
-	GENERATED_BODY()
-
-	FSpearAnimMontage() {}
-
-	UPROPERTY(EditAnywhere, Category = "Montage")
-	TArray<class UAnimMontage*> Montages;
-};
-
-/**
- * 
- */
 UCLASS()
 class PROJECTN_API APNEnemySkeleton : public APNEnemyCommonBase, public IWeaponSocketCarryInterface
 {
@@ -108,6 +72,15 @@ private:
 /* 몽타주 */
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage")
-	TMap<EWeaponType, FSwordAnimMontage> Montage;
+	TArray<class UAnimMontage*> SwordMontages;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> AxeMontages;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> SpearMontages;
+
+	UPROPERTY(VisibleAnywhere, Category = "Montage")
+	TArray<class UAnimMontage*> CurrentWeaponMontages;
 
 };

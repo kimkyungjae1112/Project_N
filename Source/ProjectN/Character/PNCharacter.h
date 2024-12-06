@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/PNCharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/HUDInterface.h"
 #include "PNCharacter.generated.h"
 
 DECLARE_DELEGATE(FChangeBehaviorState)
@@ -31,7 +32,7 @@ struct FChangeBehaviorStateWarpper //상태 변화
  * 
  */
 UCLASS()
-class PROJECTN_API APNCharacter : public APNCharacterBase
+class PROJECTN_API APNCharacter : public APNCharacterBase, public IHUDInterface
 {
 	GENERATED_BODY()
 	
@@ -50,6 +51,8 @@ public:
 
 public:
 	class APNPlayerController* GetMyController();
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 /* Camera */
 private:
@@ -143,4 +146,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Motion Warp")
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Stat System")
+	TObjectPtr<class UPNPlayerStatComponent> StatComp;
+
+/* UI */
+	virtual void SetupHUD_Widget(class UPlayerHUDWidget* InHUDWidget) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UPlayerHUDWidget> HUDWidget;
 };

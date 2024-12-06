@@ -11,7 +11,9 @@
 #include "Player/PNPlayerController.h"
 #include "Component/PNBattleSystemComponent.h"
 #include "Component/PNParkourComponent.h"
+#include "Component/PNPlayerStatComponent.h"
 #include "MotionWarpingComponent.h"
+#include "UI/PlayerHUDWidget.h"
 
 APNCharacter::APNCharacter()
 {
@@ -135,6 +137,7 @@ APNCharacter::APNCharacter()
 	BattleSystemComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
 	ParkourComp = CreateDefaultSubobject<UPNParkourComponent>(TEXT("Parkour Component"));
 	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarp Component"));
+	StatComp = CreateDefaultSubobject<UPNPlayerStatComponent>(TEXT("Stat Component"));
 
 	/* 델리게이트 */
 	BattleSystemComp->InitBehaviorState.AddUObject(this, &APNCharacter::Walk);
@@ -177,6 +180,15 @@ APNPlayerController* APNCharacter::GetMyController()
 	return CastChecked<APNPlayerController>(GetController());
 }
 
+float APNCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	StatComp->ApplyDamage(DamageAmount);
+
+	return 0.0f;
+}
+
 void APNCharacter::SetBehaviorState(const EBehaviorState& BehaviorState)
 {
 	ChangeBehaviorStateMap[BehaviorState].ChangeBehaviorState.ExecuteIfBound();
@@ -186,10 +198,8 @@ void APNCharacter::SetBehaviorStateWalk()
 {
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Walk"));
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
-		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
 	}
 }
 
@@ -197,10 +207,8 @@ void APNCharacter::SetBehaviorStateRun()
 {
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Run"));
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
-		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
 	}
 }
 
@@ -208,10 +216,8 @@ void APNCharacter::SetBehaviorStateCrouch()
 {
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
 	{
-		UE_LOG(LogTemp, Display, TEXT("Crouch"));
 		Subsystem->ClearAllMappings();
 		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
-		UE_LOG(LogTemp, Display, TEXT("IMC : %s"), *IMC[CurrentBehaviorState]->GetName());
 	}
 }
 
@@ -300,6 +306,17 @@ void APNCharacter::DashAttack()
 void APNCharacter::Assassination()
 {
 	BattleSystemComp->BeginAssassinationAttack();
+}
+
+void APNCharacter::SetupHUD_Widget(UPlayerHUDWidget* InHUDWidget)
+{
+	HUDWidget = InHUDWidget;
+	if (HUDWidget)
+	{
+		HUDWidget->SetMaxHp(StatComp->GetMaxHp());
+		HUDWidget->UpdateHpBar(StatComp->GetMaxHp());
+		StatComp->OnHpChanged.AddUObject(HUDWidget, &UPlayerHUDWidget::UpdateHpBar);
+	}
 }
 
 

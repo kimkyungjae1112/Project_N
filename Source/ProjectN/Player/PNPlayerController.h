@@ -13,5 +13,15 @@ UCLASS()
 class PROJECTN_API APNPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	APNPlayerController();
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TSubclassOf<class UPlayerHUDWidget> HUDWidgetClass;
 	
 };
