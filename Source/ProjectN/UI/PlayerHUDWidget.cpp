@@ -3,11 +3,11 @@
 
 #include "UI/PlayerHUDWidget.h"
 #include "UI/PlayerHpBarWidget.h"
+#include "UI/PlayerEnergyBarWidget.h"
 #include "Interface/HUDInterface.h"
 
 UPlayerHUDWidget::UPlayerHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	MaxHp = -1.f;
 }
 
 void UPlayerHUDWidget::NativeConstruct()
@@ -16,6 +16,9 @@ void UPlayerHUDWidget::NativeConstruct()
 
 	HpBar = Cast<UPlayerHpBarWidget>(GetWidgetFromName(TEXT("WBP_HpBar")));
 	ensure(HpBar);
+
+	EnergyBar = Cast<UPlayerEnergyBarWidget>(GetWidgetFromName(TEXT("WBP_EnergyBar")));
+	ensure(EnergyBar);
 
 	IHUDInterface* Interface = Cast<IHUDInterface>(GetOwningPlayerPawn());
 	if (Interface)
@@ -29,8 +32,17 @@ void UPlayerHUDWidget::UpdateHpBar(float NewHp)
 	HpBar->UpdateHpBar(NewHp);
 }
 
+void UPlayerHUDWidget::UpdateEnergyBar(float UseEnergy)
+{
+	EnergyBar->UpdateEnergyBar(UseEnergy);
+}
+
 void UPlayerHUDWidget::SetMaxHp(float InMaxHp)
 {
-	MaxHp = InMaxHp;
-	HpBar->SetMaxHp(MaxHp);
+	HpBar->SetMaxHp(InMaxHp);
+}
+
+void UPlayerHUDWidget::SetMaxEnergy(float InMaxEnergy)
+{
+	EnergyBar->SetMaxEnergy(InMaxEnergy);
 }

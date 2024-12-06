@@ -9,6 +9,9 @@ UPNPlayerStatComponent::UPNPlayerStatComponent()
 
 	MaxHp = 1000.f;
 	Hp = MaxHp;
+
+	MaxEnergy = 100.f;
+	Energy = MaxEnergy;
 }
 
 void UPNPlayerStatComponent::BeginPlay()
@@ -33,6 +36,12 @@ void UPNPlayerStatComponent::ApplyDamage(float InDamage)
 	{
 		OnHpZero.Broadcast();
 	}
+}
+
+void UPNPlayerStatComponent::UseEnergy(float InEnergy)
+{
+	Energy -= InEnergy;
+	OnEnergyChanged.Broadcast(Energy);
 }
 
 void UPNPlayerStatComponent::SetHp(float NewHp)

@@ -4,31 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayerHUDWidget.generated.h"
+#include "PlayerEnergyBarWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTN_API UPlayerHUDWidget : public UUserWidget
+class PROJECTN_API UPlayerEnergyBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 public:
-	UPlayerHUDWidget(const FObjectInitializer& ObjectInitializer);
+	UPlayerEnergyBarWidget(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeConstruct() override;
 
-	void UpdateHpBar(float NewHp);
 	void UpdateEnergyBar(float UseEnergy);
-	void SetMaxHp(float InMaxHp);
 	void SetMaxEnergy(float InMaxEnergy);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "HpBar")
-	TObjectPtr<class UPlayerHpBarWidget> HpBar;
+	TObjectPtr<class UProgressBar> EnergyBar;
 
-	UPROPERTY(VisibleAnywhere, Category = "EnergyBar")
-	TObjectPtr<class UPlayerEnergyBarWidget> EnergyBar;
+	float MaxEnergy;
 
 };

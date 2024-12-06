@@ -315,7 +315,10 @@ void APNCharacter::SetupHUD_Widget(UPlayerHUDWidget* InHUDWidget)
 	{
 		HUDWidget->SetMaxHp(StatComp->GetMaxHp());
 		HUDWidget->UpdateHpBar(StatComp->GetMaxHp());
+		HUDWidget->SetMaxEnergy(StatComp->GetMaxEnergy());
+		HUDWidget->UpdateEnergyBar(StatComp->GetMaxEnergy());
 		StatComp->OnHpChanged.AddUObject(HUDWidget, &UPlayerHUDWidget::UpdateHpBar);
+		StatComp->OnEnergyChanged.AddUObject(HUDWidget, &UPlayerHUDWidget::UpdateEnergyBar);
 	}
 }
 
