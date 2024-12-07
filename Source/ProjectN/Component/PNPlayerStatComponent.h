@@ -32,13 +32,19 @@ public:
 	FORCEINLINE float GetHp() const { return Hp; }
 	FORCEINLINE float GetMaxEnergy() const { return MaxEnergy; }
 	FORCEINLINE float GetEnergy() const { return Energy; }
+
+	FORCEINLINE float UseLightAttackEnergy() const { return 10.f; }
+	FORCEINLINE float UseHeavyAttackEnergy() const { return 20.f; }
+	FORCEINLINE float UseDashAttackEnergy() const { return 15.f; }
+	
 		
 public:
 	void ApplyDamage(float InDamage);
-	void UseEnergy(float InEnergy);
+	void ApplyEnergy(float InEnergy);
 
 private:
 	void SetHp(float NewHp);
+	void SetEnergy(float InEnergy);
 
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	float MaxHp;

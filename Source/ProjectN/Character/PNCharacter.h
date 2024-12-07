@@ -15,7 +15,8 @@ enum class EBehaviorState : uint8
 {
 	EWalk = 0,
 	ERun,
-	ECrouch
+	ECrouch,
+	EJump
 };
 
 USTRUCT()
@@ -71,11 +72,14 @@ private:
 	void SetBehaviorStateWalk();
 	void SetBehaviorStateRun();
 	void SetBehaviorStateCrouch();
+	void SetBehaviorStateJump();
 
 /* Input System */
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void PNJump();
+	void PNStopJump();
 	void MouseLeftAttack();
 	void MouseLeftAttackRelease();
 	void MouseLeftChargeAttack();
@@ -86,10 +90,13 @@ private:
 	void Run();
 	void Walk();
 	void OnCrouch();
-	void UnCrouch();
+	void UnnCrouch();
 	void Roll();
 	void DashAttack();
 	void Assassination();
+	void OnBlock();
+	void UnBlock();
+	bool bIsBlock = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
 	EBehaviorState CurrentBehaviorState;
@@ -130,6 +137,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> AssassinationAction;
 
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> BlockAction;
+
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> SwordMeshComp;
@@ -155,4 +165,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<class UPlayerHUDWidget> HUDWidget;
+
+
 };

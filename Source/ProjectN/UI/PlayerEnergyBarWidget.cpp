@@ -19,7 +19,8 @@ void UPlayerEnergyBarWidget::NativeConstruct()
 
 void UPlayerEnergyBarWidget::UpdateEnergyBar(float UseEnergy)
 {
-	EnergyBar->SetPercent(UseEnergy);
+	EnergyBar->SetPercent(UseEnergy / MaxEnergy);
+	UE_LOG(LogTemp, Warning, TEXT("Energy Use? : %f"), UseEnergy / MaxEnergy);
 }
 
 void UPlayerEnergyBarWidget::SetMaxEnergy(float InMaxEnergy)

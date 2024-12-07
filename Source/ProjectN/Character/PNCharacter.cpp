@@ -72,9 +72,15 @@ APNCharacter::APNCharacter()
 	{
 		IMC.Add(EBehaviorState::ECrouch, IMC_CrouchRef.Object);
 	}
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_JumpRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_Jump.IMC_Jump'"));
+	if (IMC_JumpRef.Object)
+	{
+		IMC.Add(EBehaviorState::EJump, IMC_JumpRef.Object);
+	}
 	ChangeBehaviorStateMap.Add(EBehaviorState::EWalk, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateWalk)));
 	ChangeBehaviorStateMap.Add(EBehaviorState::ERun, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateRun)));
 	ChangeBehaviorStateMap.Add(EBehaviorState::ECrouch, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateCrouch)));
+	ChangeBehaviorStateMap.Add(EBehaviorState::EJump, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateJump)));
 
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Move.IA_Move'"));
@@ -132,6 +138,11 @@ APNCharacter::APNCharacter()
 	{
 		AssassinationAction = AssassinationActionRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> BlockActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Block.IA_Block'"));
+	if (BlockActionRef.Object)
+	{
+		BlockAction = BlockActionRef.Object;
+	}
 	
 	/* 사제 컴포넌트 */
 	BattleSystemComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
@@ -166,13 +177,15 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(MouseRightHeavyAttackAction, ETriggerEvent::Started, this, &APNCharacter::MouseRightAttack);
 	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Started, this, &APNCharacter::Run);
 	EnhancedInput->BindAction(RunAndWalkAction, ETriggerEvent::Completed, this, &APNCharacter::Walk);
-	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &APNCharacter::PNJump);
+	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &APNCharacter::PNStopJump);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &APNCharacter::OnCrouch);
-	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APNCharacter::UnCrouch);
+	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APNCharacter::UnnCrouch);
 	EnhancedInput->BindAction(RollAction, ETriggerEvent::Started, this, &APNCharacter::Roll);
 	EnhancedInput->BindAction(DashAttackAction, ETriggerEvent::Started, this, &APNCharacter::DashAttack);
 	EnhancedInput->BindAction(AssassinationAction, ETriggerEvent::Started, this, &APNCharacter::Assassination);
+	EnhancedInput->BindAction(BlockAction, ETriggerEvent::Started, this, &APNCharacter::OnBlock);
+	EnhancedInput->BindAction(BlockAction, ETriggerEvent::Completed, this, &APNCharacter::UnBlock);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -184,7 +197,16 @@ float APNCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	if (bIsBlock)
+	{
+		BattleSystemComp->BeginBlockAttacked();
+		StatComp->ApplyDamage(DamageAmount / 0.7f);
+		return -1.f;
+	}
+
+	BattleSystemComp->BeginAttacked();
 	StatComp->ApplyDamage(DamageAmount);
+
 
 	return 0.0f;
 }
@@ -221,6 +243,15 @@ void APNCharacter::SetBehaviorStateCrouch()
 	}
 }
 
+void APNCharacter::SetBehaviorStateJump()
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
+	{
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
+	}
+}
+
 void APNCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D InputValue = Value.Get<FVector2D>();
@@ -241,6 +272,20 @@ void APNCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerPitchInput(InputValue.X * 0.5f);
 	AddControllerYawInput(-InputValue.Y * 0.5f);
+}
+
+void APNCharacter::PNJump()
+{
+	CurrentBehaviorState = EBehaviorState::EJump;
+	SetBehaviorState(CurrentBehaviorState);
+	ACharacter::Jump();
+}
+
+void APNCharacter::PNStopJump()
+{
+	CurrentBehaviorState = EBehaviorState::EWalk;
+	SetBehaviorState(CurrentBehaviorState);
+	ACharacter::StopJumping();
 }
 
 void APNCharacter::MouseLeftAttack()
@@ -267,6 +312,7 @@ void APNCharacter::MouseRightAttack()
 
 void APNCharacter::Run()
 {
+	UnBlock();
 	CurrentBehaviorState = EBehaviorState::ERun;
 	SetBehaviorState(CurrentBehaviorState);
 	ParkourComp->Run();
@@ -286,7 +332,7 @@ void APNCharacter::OnCrouch()
 	ParkourComp->Crouch();
 }
 
-void APNCharacter::UnCrouch()
+void APNCharacter::UnnCrouch()
 {
 	CurrentBehaviorState = EBehaviorState::EWalk;
 	SetBehaviorState(CurrentBehaviorState);
@@ -306,6 +352,18 @@ void APNCharacter::DashAttack()
 void APNCharacter::Assassination()
 {
 	BattleSystemComp->BeginAssassinationAttack();
+}
+
+void APNCharacter::OnBlock()
+{
+	bIsBlock = true;
+	BattleSystemComp->BeginBlock();
+}
+
+void APNCharacter::UnBlock()
+{
+	bIsBlock = false;
+	BattleSystemComp->EndBlock();
 }
 
 void APNCharacter::SetupHUD_Widget(UPlayerHUDWidget* InHUDWidget)

@@ -55,7 +55,15 @@ public:
 
 	/* Assassination Attack */
 	void BeginAssassinationAttack();
+
+	/* Block */
+	void BeginBlock();
+	void EndBlock();
 	
+	/* Attacked */
+	void BeginBlockAttacked();
+	void BeginAttacked();
+
 private:
 	/* 차징 */
 	void Charge();
@@ -94,6 +102,10 @@ private:
 	bool HasNextHeavyAttack = false;
 	FTimerHandle HeavyAttackTimer;
 
+	/* Attacked */
+	void EndBlockAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
+	void EndAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
+
 
 /* UI */
 private:
@@ -117,6 +129,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Combo")
 	TObjectPtr<class UPNCharacterComboDataAsset> ComboData;
 
+	UPROPERTY(VisibleAnywhere, Category = "Stat")
+	TObjectPtr<class UPNPlayerStatComponent> StatComp;
 
 /* Montage */
 private:
@@ -137,4 +151,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> AssassinationMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> BlockAttackedMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> AttackedMontage;
 };

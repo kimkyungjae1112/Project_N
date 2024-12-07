@@ -3,12 +3,13 @@
 
 #include "Component/PNBattleSystemComponent.h"
 #include "GameFramework/Character.h"
-#include "Animation/AnimInstance.h"
+#include "Animation/PNAnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Character/PNCharacterComboDataAsset.h"
 #include "Interface/EnemyApplyDamageInterface.h"
 #include "Blueprint/UserWidget.h"
 #include "MotionWarpingComponent.h"
+#include "Component/PNPlayerStatComponent.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
@@ -33,6 +34,7 @@ void UPNBattleSystemComponent::BeginPlay()
 	ensure(Anim);
 
 	AssassinationUI = CreateWidget(GetWorld(), AssassinationUIClass);
+	StatComp = GetOwner()->GetComponentByClass<UPNPlayerStatComponent>();
 }
 
 void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -127,6 +129,7 @@ void UPNBattleSystemComponent::FailCharge()
 void UPNBattleSystemComponent::LightAttack()
 {
 	CurrentLightAttackCombo = 1;
+	StatComp->ApplyEnergy(10.f);
 	Anim->Montage_Play(AttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -163,6 +166,7 @@ void UPNBattleSystemComponent::CheckTimerLightAttack()
 	LightAttackTimer.Invalidate();
 	if (HasNextLightAttack)
 	{
+		StatComp->ApplyEnergy(10.f);
 		CurrentLightAttackCombo = FMath::Clamp(CurrentLightAttackCombo + 1, 1, ComboData->MaxCombo[EAttackMontage::Light]);
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->SectionName[EAttackMontage::Light], CurrentLightAttackCombo);
 		Anim->Montage_JumpToSection(NextSection, AttackMontage);
@@ -198,6 +202,38 @@ void UPNBattleSystemComponent::BeginAssassinationAttack()
 
 	AssassinationMotionWarpSet();
 	Anim->Montage_Play(AssassinationMontage);
+}
+
+void UPNBattleSystemComponent::BeginBlock()
+{
+	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
+
+	PNAnim->bIsBlock = true;
+}
+
+void UPNBattleSystemComponent::EndBlock()
+{
+	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
+
+	PNAnim->bIsBlock = false;
+}
+
+void UPNBattleSystemComponent::BeginBlockAttacked()
+{
+	Anim->Montage_Play(BlockAttackedMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndBlockAttacked);
+	Anim->Montage_SetEndDelegate(MontageEnd, BlockAttackedMontage);
+}
+
+void UPNBattleSystemComponent::BeginAttacked()
+{
+	Anim->Montage_Play(AttackedMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndAttacked);
+	Anim->Montage_SetEndDelegate(MontageEnd, AttackedMontage);
 }
 
 void UPNBattleSystemComponent::EndChargeAttack(UAnimMontage* Target, bool IsProperlyEnded)
@@ -303,4 +339,12 @@ void UPNBattleSystemComponent::CheckTimerHeavyAttack()
 		SetTimerHeavyAttack();
 		HasNextHeavyAttack = false;
 	}
+}
+
+void UPNBattleSystemComponent::EndBlockAttacked(UAnimMontage* Target, bool IsProperlyEnded)
+{
+}
+
+void UPNBattleSystemComponent::EndAttacked(UAnimMontage* Target, bool IsProperlyEnded)
+{
 }

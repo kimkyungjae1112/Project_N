@@ -24,6 +24,11 @@ void UPNPlayerStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (Energy < MaxEnergy - KINDA_SMALL_NUMBER)
+	{
+		float PrevEnergy = FMath::Clamp(Energy + DeltaTime * 7.f, 0, MaxEnergy);
+		SetEnergy(PrevEnergy);
+	}
 }
 
 void UPNPlayerStatComponent::ApplyDamage(float InDamage)
@@ -38,9 +43,21 @@ void UPNPlayerStatComponent::ApplyDamage(float InDamage)
 	}
 }
 
-void UPNPlayerStatComponent::UseEnergy(float InEnergy)
+void UPNPlayerStatComponent::ApplyEnergy(float InEnergy)
 {
-	Energy -= InEnergy;
+	float ActualEnergy = FMath::Clamp(InEnergy, 0, InEnergy);
+	float PrevEnergy = Energy;
+
+	SetEnergy(PrevEnergy - ActualEnergy);
+	/*if (Energy < KINDA_SMALL_NUMBER)
+	{
+		OnHpZero.Broadcast();
+	}*/
+}
+
+void UPNPlayerStatComponent::SetEnergy(float InEnergy)
+{
+	Energy = InEnergy;
 	OnEnergyChanged.Broadcast(Energy);
 }
 
