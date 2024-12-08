@@ -6,6 +6,7 @@
 #include "Character/PNCharacterBase.h"
 #include "InputActionValue.h"
 #include "Interface/HUDInterface.h"
+#include "Interface/WeaponSocketCarryInterface.h"
 #include "PNCharacter.generated.h"
 
 DECLARE_DELEGATE(FChangeBehaviorState)
@@ -33,7 +34,7 @@ struct FChangeBehaviorStateWarpper //상태 변화
  * 
  */
 UCLASS()
-class PROJECTN_API APNCharacter : public APNCharacterBase, public IHUDInterface
+class PROJECTN_API APNCharacter : public APNCharacterBase, public IHUDInterface, public IWeaponSocketCarryInterface
 {
 	GENERATED_BODY()
 	
@@ -54,6 +55,8 @@ public:
 	class APNPlayerController* GetMyController();
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual class USkeletalMeshComponent* GetWeaponMeshComponent() override;
 
 /* Camera */
 private:

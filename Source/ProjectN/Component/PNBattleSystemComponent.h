@@ -14,7 +14,8 @@ enum class EAttackState : uint8
 	ASIdle,
 	ASLight,
 	ASHeavy,
-	ASCharge
+	ASCharge,
+	ASDash
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,6 +33,8 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	FInitBehaviorState InitBehaviorState;
+
+	FORCEINLINE EAttackState GetAttackState() { return CurrentAttackState; }
 
 /* 공격 */
 public:

@@ -211,6 +211,11 @@ float APNCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	return 0.0f;
 }
 
+USkeletalMeshComponent* APNCharacter::GetWeaponMeshComponent()
+{
+	return SwordMeshComp;
+}
+
 void APNCharacter::SetBehaviorState(const EBehaviorState& BehaviorState)
 {
 	ChangeBehaviorStateMap[BehaviorState].ChangeBehaviorState.ExecuteIfBound();

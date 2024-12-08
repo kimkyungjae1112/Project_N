@@ -189,6 +189,9 @@ void UPNBattleSystemComponent::BeginDashAttack()
 {
 	if (bIsDashAttacking) return;
 	bIsDashAttacking = true;
+
+	CurrentAttackState = EAttackState::ASDash;
+
 	Anim->Montage_Play(DashAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -243,6 +246,7 @@ void UPNBattleSystemComponent::EndChargeAttack(UAnimMontage* Target, bool IsProp
 
 void UPNBattleSystemComponent::EndDashAttack(UAnimMontage* Target, bool IsProperlyEnded)
 {
+	CurrentAttackState = EAttackState::ASIdle;
 	bIsDashAttacking = false;
 	InitBehaviorState.Broadcast();
 }
