@@ -70,6 +70,14 @@ void APNEnemyRampage::ApplyDamage(float DamageAmount, AActor* DamageCauser, cons
 
 void APNEnemyRampage::SetDead()
 {
+	Super::SetDead();
+
+	GetMyController()->StopAI();
+
+	Anim->StopAllMontages(0.5f);
+	Anim->Montage_Play(DeadMontage);
+
+	SetActorEnableCollision(false);
 }
 
 void APNEnemyRampage::BeginPlay()
@@ -86,7 +94,6 @@ APNAIControllerRampage* APNEnemyRampage::GetMyController()
 
 void APNEnemyRampage::BeginDefaultAttack()
 {
-	UE_LOG(LogTemp, Display, TEXT("Attack 실행"));
 	DefaultAttackCombo = 1;
 	Anim->Montage_Play(DefaultAttackMontage);
 

@@ -178,6 +178,7 @@ void UPNBattleSystemComponent::CheckTimerLightAttack()
 
 void UPNBattleSystemComponent::ChargeAttack()
 {
+	StatComp->ApplyEnergy(20.f);
 	Anim->Montage_Play(ChargeAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -192,6 +193,7 @@ void UPNBattleSystemComponent::BeginDashAttack()
 
 	CurrentAttackState = EAttackState::ASDash;
 
+	StatComp->ApplyEnergy(20.f);
 	Anim->Montage_Play(DashAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -203,6 +205,7 @@ void UPNBattleSystemComponent::BeginAssassinationAttack()
 {
 	if (!bCanAssassination) return;
 
+	StatComp->ApplyEnergy(25.f);
 	AssassinationMotionWarpSet();
 	Anim->Montage_Play(AssassinationMontage);
 }
@@ -223,6 +226,7 @@ void UPNBattleSystemComponent::EndBlock()
 
 void UPNBattleSystemComponent::BeginBlockAttacked()
 {
+	StatComp->ApplyEnergy(5.f);
 	Anim->Montage_Play(BlockAttackedMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -303,6 +307,7 @@ void UPNBattleSystemComponent::AssassinationMotionWarpSet()
 void UPNBattleSystemComponent::BeginHeavyAttack()
 {
 	CurrentHeavyAttackCombo = 1;
+	StatComp->ApplyEnergy(15.f);
 	Anim->Montage_Play(HeavyAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -336,6 +341,7 @@ void UPNBattleSystemComponent::CheckTimerHeavyAttack()
 	HeavyAttackTimer.Invalidate();
 	if (HasNextHeavyAttack)
 	{
+		StatComp->ApplyEnergy(15.f);
 		CurrentHeavyAttackCombo = FMath::Clamp(CurrentHeavyAttackCombo + 1, 1, ComboData->MaxCombo[EAttackMontage::Heavy]);
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->SectionName[EAttackMontage::Heavy], CurrentHeavyAttackCombo);
 		Anim->Montage_JumpToSection(NextSection, HeavyAttackMontage);
