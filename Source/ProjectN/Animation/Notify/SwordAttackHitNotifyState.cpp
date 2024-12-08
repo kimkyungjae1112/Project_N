@@ -76,7 +76,7 @@ void USwordAttackHitNotifyState::MakeLineTrace(AActor* Owner)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params(NAME_None, true, Owner);
-			DrawDebugLine(Owner->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
+			//DrawDebugLine(Owner->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
 
 			bool bHit = Owner->GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel2, Params);
 			if (bHit && !HitEnemys.Contains(HitResult.GetActor()))

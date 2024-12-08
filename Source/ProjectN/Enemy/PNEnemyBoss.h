@@ -25,18 +25,42 @@ public:
 	virtual float GetMeleeAttackInRange() override;
 	virtual void Attack_1() override;
 	virtual void Attack_2() override;
+	virtual void Attack_3() override;
+	virtual void Attack_4() override;
+	virtual void Attack_5() override;
+	virtual void Attack_6() override;
 
-	virtual class APNAIControllerBase* GetAIController();
+	virtual class APNAIControllerBase* GetAIController() override;
+	virtual void NextComboAttack() override;
 
 	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
 
 	virtual void SetDead() override;
 
+/* 공격 */
 private:
-	void BeginAttack_1_Default();
-	void EndAttack_1_Default(class UAnimMontage* Target, bool IsProperlyEnded);
+	void BeginMeleeAttack_1();
+	void EndMeleeAttack_1(class UAnimMontage* Target, bool IsProperlyEnded);
 
+	void BeginMeleeAttack_2();
+	void EndMeleeAttack_2(class UAnimMontage* Target, bool IsProperlyEnded);
+
+	void BeginMeleeAttack_3();
+	void EndMeleeAttack_3(class UAnimMontage* Target, bool IsProperlyEnded);
+
+	void BeginMeleeAttack_4();
+	void EndMeleeAttack_4(class UAnimMontage* Target, bool IsProperlyEnded);
+
+	void BeginRangedAttack_1();
+	void EndRangedAttack_1(class UAnimMontage* Target, bool IsProperlyEnded);
+
+	void BeginRangedAttack_2();
+	void EndRangedAttack_2(class UAnimMontage* Target, bool IsProperlyEnded);
+
+/* 공격 관련 데이터 */
+private:
+	uint8 Attack_1_Combo;
 
 /* 유틸 */
 private:
@@ -48,13 +72,29 @@ private:
 	TObjectPtr<class UAnimInstance> Anim;
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
-	TObjectPtr<class UAnimMontage> Attack_1_Montage;
+	TObjectPtr<class UAnimMontage> MeleeAttack_1_Montage;
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
-	TObjectPtr<class UAnimMontage> Attack_2_Montage;
+	TObjectPtr<class UAnimMontage> MeleeAttack_2_Montage;
 
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> MeleeAttack_3_Montage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> MeleeAttack_4_Montage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> RangedAttack_1_Montage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> RangedAttack_2_Montage;
+
+/* 컴포넌트 */
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	TObjectPtr<class USkeletalMeshComponent> SwordMeshComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "MotionWarp")
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpComp;
 
 };

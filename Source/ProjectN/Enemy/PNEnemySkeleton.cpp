@@ -7,6 +7,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 
 APNEnemySkeleton::APNEnemySkeleton()
 {
@@ -65,6 +67,9 @@ void APNEnemySkeleton::ApplyDamage(float DamageAmount, AActor* DamageCauser, con
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
+	//ImpactNiagaraComop->SetRelativeLocation(ImpactLocation);
+	ImpactNiagaraComop->SetAsset(DefaultImpactNiagara);
+	ImpactNiagaraComop->Activate();
 	StatComp->ApplyDamage(DamageAmount);
 }
 

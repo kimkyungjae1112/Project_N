@@ -19,7 +19,7 @@ void APNEnemyTest::ApplyDamage(float DamageAmount, AActor* DamageCauser, const F
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
-	NiagaraComp->SetRelativeLocation(ImpactLocation);
+	//NiagaraComp->SetRelativeLocation(ImpactLocation);
 	NiagaraComp->Activate();
 
 	StatComp->ApplyDamage(DamageAmount);

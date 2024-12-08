@@ -3,7 +3,10 @@
 
 #include "Enemy/PNEnemyBoss.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "AI/Controller/PNAIControllerBoss.h"
+#include "MotionWarpingComponent.h"
+#include "Component/PNEnemyStatComponent.h"
 
 APNEnemyBoss::APNEnemyBoss()
 {
@@ -13,6 +16,7 @@ APNEnemyBoss::APNEnemyBoss()
 		GetMesh()->SetSkeletalMesh(MeshRef.Object);
 	}
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
 
 	SwordMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Sword Mesh Component"));
 	SwordMeshComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
@@ -22,7 +26,11 @@ APNEnemyBoss::APNEnemyBoss()
 		SwordMeshComp->SetSkeletalMesh(SwordMeshRef.Object);
 	}
 
+	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Component"));
+	StatComp->OnHpZero.AddUObject(this, &APNEnemyBoss::SetDead);
+
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	Attack_1_Combo = 0;
 }
 
 void APNEnemyBoss::BeginPlay()
@@ -35,25 +43,65 @@ void APNEnemyBoss::BeginPlay()
 
 float APNEnemyBoss::GetMeleeAttackInRange()
 {
-	return 550.0f;
+	return 400.0f;
 }
 
 void APNEnemyBoss::Attack_1()
 {
 	Super::Attack_1();
 
-	BeginAttack_1_Default();
+	BeginMeleeAttack_1();
 }
 
 void APNEnemyBoss::Attack_2()
 {
 	Super::Attack_2();
 
+	BeginMeleeAttack_2();
+}
+
+void APNEnemyBoss::Attack_3()
+{
+	Super::Attack_3();
+
+	BeginMeleeAttack_3();
+}
+
+void APNEnemyBoss::Attack_4()
+{
+	Super::Attack_4();
+
+	BeginMeleeAttack_4();
+}
+
+void APNEnemyBoss::Attack_5()
+{
+	Super::Attack_5();
+
+	BeginRangedAttack_1();
+}
+
+void APNEnemyBoss::Attack_6()
+{
+	Super::Attack_6();
+
+	BeginRangedAttack_2();
 }
 
 APNAIControllerBase* APNEnemyBoss::GetAIController()
 {
 	return GetMyController();
+}
+
+void APNEnemyBoss::NextComboAttack()
+{
+	Super::NextComboAttack();
+
+	Attack_1_Combo = FMath::Clamp(Attack_1_Combo + 1, 0, 3);
+	UE_LOG(LogTemp, Display, TEXT("DefaultAttackCombo %d"), Attack_1_Combo);
+
+	FName NextSection = *FString::Printf(TEXT("%s%d"), TEXT("Combo"), Attack_1_Combo);
+	Anim->Montage_JumpToSection(NextSection, MeleeAttack_1_Montage);
 }
 
 void APNEnemyBoss::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
@@ -64,20 +112,94 @@ void APNEnemyBoss::ApplyDamage(float DamageAmount, AActor* DamageCauser, const F
 
 void APNEnemyBoss::SetDead()
 {
+	Super::SetDead();
+
+	GetMyController()->StopAI();
 }
 
-void APNEnemyBoss::BeginAttack_1_Default()
+void APNEnemyBoss::BeginMeleeAttack_1()
 {
-	Anim->Montage_Play(Attack_1_Montage);
+	Attack_1_Combo = 1;
+	Anim->Montage_Play(MeleeAttack_1_Montage);
 
 	FOnMontageEnded MontageEnd;
-	MontageEnd.BindUObject(this, &APNEnemyBoss::EndAttack_1_Default);
-	Anim->Montage_SetEndDelegate(MontageEnd, Attack_1_Montage);
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndMeleeAttack_1);
+	Anim->Montage_SetEndDelegate(MontageEnd, MeleeAttack_1_Montage);
 }
 
-void APNEnemyBoss::EndAttack_1_Default(UAnimMontage* Target, bool IsProperlyEnded)
+void APNEnemyBoss::EndMeleeAttack_1(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	OnAttack_1_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::BeginMeleeAttack_2()
+{
+	Anim->Montage_Play(MeleeAttack_2_Montage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndMeleeAttack_2);
+	Anim->Montage_SetEndDelegate(MontageEnd, MeleeAttack_2_Montage);
+}
+
+void APNEnemyBoss::EndMeleeAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	OnAttack_2_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::BeginMeleeAttack_3()
+{
+	Anim->Montage_Play(MeleeAttack_3_Montage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndMeleeAttack_3);
+	Anim->Montage_SetEndDelegate(MontageEnd, MeleeAttack_3_Montage);
+}
+
+void APNEnemyBoss::EndMeleeAttack_3(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	OnAttack_3_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::BeginMeleeAttack_4()
+{
+	Anim->Montage_Play(MeleeAttack_4_Montage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndMeleeAttack_4);
+	Anim->Montage_SetEndDelegate(MontageEnd, MeleeAttack_4_Montage);
+}
+
+void APNEnemyBoss::EndMeleeAttack_4(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	OnAttack_4_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::BeginRangedAttack_1()
+{
+	Anim->Montage_Play(RangedAttack_1_Montage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndRangedAttack_1);
+	Anim->Montage_SetEndDelegate(MontageEnd, RangedAttack_1_Montage);
+}
+
+void APNEnemyBoss::EndRangedAttack_1(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	OnAttack_5_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::BeginRangedAttack_2()
+{
+	Anim->Montage_Play(RangedAttack_2_Montage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndRangedAttack_2);
+	Anim->Montage_SetEndDelegate(MontageEnd, RangedAttack_2_Montage);
+}
+
+void APNEnemyBoss::EndRangedAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	OnAttack_6_Finished.ExecuteIfBound();
 }
 
 APNAIControllerBoss* APNEnemyBoss::GetMyController()

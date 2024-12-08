@@ -29,3 +29,27 @@ void APNAIControllerBoss::BeginPlay()
 	GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), UGameplayStatics::GetActorOfClass(GetWorld(), APNCharacter::StaticClass()));
 }
 
+void APNAIControllerBoss::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	APawn* Target = Cast<APawn>(GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
+	if (Target)
+	{
+		FRotator TargetRotation = (Target->GetActorLocation() - GetPawn()->GetActorLocation()).Rotation();
+		TargetRotation.Roll = 0;
+		TargetRotation.Pitch = 0;
+
+		Interval += DeltaTime;
+		if (Interval >= 2.5f)
+		{
+			FVector TargetLocation = Target->GetActorLocation();
+			TargetLocation.X += FMath::RandRange(-1000.f, 1000.f);
+			TargetLocation.Y += FMath::RandRange(-1000.f, 1000.f);
+			MoveToLocation(TargetLocation);
+			Interval = 0.f;
+		}
+		GetPawn()->SetActorRotation(TargetRotation);
+	}
+}
+

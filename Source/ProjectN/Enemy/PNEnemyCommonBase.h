@@ -28,6 +28,10 @@ public:
 
 	virtual void SetDead() override { }
 
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Effect")
+	TObjectPtr<class UNiagaraComponent> ImpactNiagaraComop;
+
 private:
 	void DisplayDamageTextUI(float Damage);
 

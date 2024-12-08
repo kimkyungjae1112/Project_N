@@ -5,6 +5,7 @@
 #include "UI/EnemyRefWidgetComponent.h"
 #include "UI/EnemyHpBarWidget.h"
 #include "UI/DamageTextWidget.h"
+#include "NiagaraComponent.h"
 
 APNEnemyCommonBase::APNEnemyCommonBase()
 {
@@ -34,7 +35,8 @@ APNEnemyCommonBase::APNEnemyCommonBase()
 		DamageTextWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
-
+	ImpactNiagaraComop = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Impact Niagara Component"));
+	ImpactNiagaraComop->SetupAttachment(GetMesh());
 }
 
 void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)

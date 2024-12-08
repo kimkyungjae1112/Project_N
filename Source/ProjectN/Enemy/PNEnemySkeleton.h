@@ -83,4 +83,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Montage")
 	TArray<class UAnimMontage*> CurrentWeaponMontages;
 
+/* 이펙트 */
+private:
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	TObjectPtr<class UNiagaraSystem> DefaultImpactNiagara;
+
 };
