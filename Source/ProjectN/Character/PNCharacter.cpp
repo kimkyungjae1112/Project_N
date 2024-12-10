@@ -44,7 +44,8 @@ APNCharacter::APNCharacter()
 	}
 
 	SheathMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Sheath"));
-	SheathMeshComp->SetupAttachment(GetMesh(), TEXT("thigh_lSocket"));
+	SheathMeshComp->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
+	SheathMeshComp->SetVisibility(false);
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SheathMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/ARPG_Samurai/Demo/Weapon/Mesh/scabbard.scabbard'"));
 	if (SheathMeshRef.Object)
 	{
@@ -77,10 +78,16 @@ APNCharacter::APNCharacter()
 	{
 		IMC.Add(EBehaviorState::EJump, IMC_JumpRef.Object);
 	}
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC_WeaponSwapRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Project_N/Input/IMC/IMC_NonCombat.IMC_NonCombat'"));
+	if (IMC_WeaponSwapRef.Object)
+	{
+		IMC.Add(EBehaviorState::ENonCombat, IMC_WeaponSwapRef.Object);
+	}
 	ChangeBehaviorStateMap.Add(EBehaviorState::EWalk, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateWalk)));
 	ChangeBehaviorStateMap.Add(EBehaviorState::ERun, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateRun)));
 	ChangeBehaviorStateMap.Add(EBehaviorState::ECrouch, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateCrouch)));
 	ChangeBehaviorStateMap.Add(EBehaviorState::EJump, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateJump)));
+	ChangeBehaviorStateMap.Add(EBehaviorState::ENonCombat, FChangeBehaviorStateWarpper(FChangeBehaviorState::CreateUObject(this, &APNCharacter::SetBehaviorStateNonCombat)));
 
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> MoveActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_Move.IA_Move'"));
@@ -143,6 +150,11 @@ APNCharacter::APNCharacter()
 	{
 		BlockAction = BlockActionRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> WeaponSwapActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Project_N/Input/IA/IA_WeaponSwap.IA_WeaponSwap'"));
+	if (WeaponSwapActionRef.Object)
+	{
+		WeaponSwapAction = WeaponSwapActionRef.Object;
+	}
 	
 	/* 사제 컴포넌트 */
 	BattleSystemComp = CreateDefaultSubobject<UPNBattleSystemComponent>(TEXT("Battle System Component"));
@@ -186,6 +198,7 @@ void APNCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInput->BindAction(AssassinationAction, ETriggerEvent::Started, this, &APNCharacter::Assassination);
 	EnhancedInput->BindAction(BlockAction, ETriggerEvent::Started, this, &APNCharacter::OnBlock);
 	EnhancedInput->BindAction(BlockAction, ETriggerEvent::Completed, this, &APNCharacter::UnBlock);
+	EnhancedInput->BindAction(WeaponSwapAction, ETriggerEvent::Started, this, &APNCharacter::ChangeNonCombat);
 }
 
 APNPlayerController* APNCharacter::GetMyController()
@@ -249,6 +262,15 @@ void APNCharacter::SetBehaviorStateCrouch()
 }
 
 void APNCharacter::SetBehaviorStateJump()
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
+	{
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(IMC[CurrentBehaviorState], 0);
+	}
+}
+
+void APNCharacter::SetBehaviorStateNonCombat()
 {
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetMyController()->GetLocalPlayer()))
 	{
@@ -369,6 +391,22 @@ void APNCharacter::UnBlock()
 {
 	bIsBlock = false;
 	BattleSystemComp->EndBlock();
+}
+
+void APNCharacter::ChangeNonCombat()
+{
+	BattleSystemComp->BeginChangeNonCombat();
+	HaveWeapon = !HaveWeapon;
+	if (!HaveWeapon)
+	{
+		SheathMeshComp->SetVisibility(true);
+		SwordMeshComp->SetVisibility(false);
+	}
+	else
+	{
+		SheathMeshComp->SetVisibility(false);
+		SwordMeshComp->SetVisibility(true);
+	}
 }
 
 void APNCharacter::SetupHUD_Widget(UPlayerHUDWidget* InHUDWidget)

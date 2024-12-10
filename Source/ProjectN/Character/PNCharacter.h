@@ -17,7 +17,8 @@ enum class EBehaviorState : uint8
 	EWalk = 0,
 	ERun,
 	ECrouch,
-	EJump
+	EJump,
+	ENonCombat
 };
 
 USTRUCT()
@@ -76,6 +77,7 @@ private:
 	void SetBehaviorStateRun();
 	void SetBehaviorStateCrouch();
 	void SetBehaviorStateJump();
+	void SetBehaviorStateNonCombat();
 
 /* Input System */
 private:
@@ -100,6 +102,9 @@ private:
 	void OnBlock();
 	void UnBlock();
 	bool bIsBlock = false;
+
+	void ChangeNonCombat();
+	bool HaveWeapon = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Utility", meta = (AllowPrivateAccess = "true"))
 	EBehaviorState CurrentBehaviorState;
@@ -142,6 +147,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> BlockAction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> WeaponSwapAction;
 
 /* Mesh */
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")

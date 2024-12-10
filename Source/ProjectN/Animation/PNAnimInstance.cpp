@@ -12,6 +12,7 @@ UPNAnimInstance::UPNAnimInstance()
 	JumpingThreshould = 30.f;
 	bIsBlock = false;
 	bIsCrouch = false;
+	bIsNoWeapon = false;
 }
 
 void UPNAnimInstance::NativeInitializeAnimation()

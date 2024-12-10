@@ -67,6 +67,9 @@ public:
 	void BeginBlockAttacked();
 	void BeginAttacked();
 
+	/* Change Non Combat */
+	void BeginChangeNonCombat();
+
 private:
 	/* 차징 */
 	void Charge();
@@ -109,6 +112,8 @@ private:
 	void EndBlockAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
 	void EndAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
 
+	/* Change Non Combat */
+	void EndChangeNonCombat(class UAnimMontage* Target, bool IsProperlyEnded);
 
 /* UI */
 private:
@@ -160,4 +165,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> AttackedMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> NonWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> WeaponMontage;
 };

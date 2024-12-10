@@ -10,6 +10,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MotionWarpingComponent.h"
 #include "Component/PNPlayerStatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
@@ -243,6 +244,31 @@ void UPNBattleSystemComponent::BeginAttacked()
 	Anim->Montage_SetEndDelegate(MontageEnd, AttackedMontage);
 }
 
+void UPNBattleSystemComponent::BeginChangeNonCombat()
+{
+	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
+
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndChangeNonCombat);
+
+	PNAnim->bIsNoWeapon = ~PNAnim->bIsNoWeapon;
+	if (PNAnim->bIsNoWeapon)
+	{
+		PNAnim->Montage_Play(NonWeaponMontage);
+		Anim->Montage_SetEndDelegate(MontageEnd, NonWeaponMontage);
+	}
+	else
+	{
+		PNAnim->Montage_Play(WeaponMontage);
+		Anim->Montage_SetEndDelegate(MontageEnd, WeaponMontage);
+	}
+
+	
+	
+}
+
 void UPNBattleSystemComponent::EndChargeAttack(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	CurrentAttackState = EAttackState::ASIdle;
@@ -357,4 +383,9 @@ void UPNBattleSystemComponent::EndBlockAttacked(UAnimMontage* Target, bool IsPro
 
 void UPNBattleSystemComponent::EndAttacked(UAnimMontage* Target, bool IsProperlyEnded)
 {
+}
+
+void UPNBattleSystemComponent::EndChangeNonCombat(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
