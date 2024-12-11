@@ -38,6 +38,9 @@ public:
 
 	virtual void SetDead() override;
 
+	/* UI */
+	void DisplayStatus();
+
 /* 공격 */
 private:
 	void BeginMeleeAttack_1();
@@ -60,7 +63,7 @@ private:
 
 /* 공격 관련 데이터 */
 private:
-	uint8 Attack_1_Combo;
+	uint8 Attack_1_Combo = 0;
 
 /* 유틸 */
 private:
@@ -96,5 +99,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "MotionWarp")
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpComp;
+
+/* UI */
+private:
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<class UBossStatusWidget> BossStatusClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UBossStatusWidget> BossStatusPtr;
 
 };

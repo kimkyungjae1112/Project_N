@@ -7,6 +7,7 @@
 #include "AI/Controller/PNAIControllerBoss.h"
 #include "MotionWarpingComponent.h"
 #include "Component/PNEnemyStatComponent.h"
+#include "UI/BossStatusWidget.h"
 
 APNEnemyBoss::APNEnemyBoss()
 {
@@ -29,8 +30,13 @@ APNEnemyBoss::APNEnemyBoss()
 	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Component"));
 	StatComp->OnHpZero.AddUObject(this, &APNEnemyBoss::SetDead);
 
+	static ConstructorHelpers::FClassFinder<UBossStatusWidget> BossStatusClassRef(TEXT("/Game/Project_N/UI/WBP_BossStatus.WBP_BossStatus_C"));
+	if (BossStatusClassRef.Class)
+	{
+		BossStatusClass = BossStatusClassRef.Class;
+	}
+
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	Attack_1_Combo = 0;
 }
 
 void APNEnemyBoss::BeginPlay()
@@ -115,6 +121,21 @@ void APNEnemyBoss::SetDead()
 	Super::SetDead();
 
 	GetMyController()->StopAI();
+}
+
+void APNEnemyBoss::DisplayStatus()
+{
+	BossStatusPtr = CreateWidget<UBossStatusWidget>(GetWorld(), BossStatusClass);
+	if (BossStatusPtr)
+	{
+		BossStatusPtr->AddToViewport();
+
+		BossStatusPtr->SetMaxHp(1.f);
+		BossStatusPtr->UpdateHpBar(1.f);
+		StatComp->OnHpChanged.AddUObject(BossStatusPtr, &UBossStatusWidget::UpdateHpBar);
+		
+	}
+
 }
 
 void APNEnemyBoss::BeginMeleeAttack_1()
