@@ -92,6 +92,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> RangedAttack_2_Montage;
 
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> DeadMontage;
+
 /* 컴포넌트 */
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")

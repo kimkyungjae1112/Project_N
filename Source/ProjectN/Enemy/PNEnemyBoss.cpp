@@ -114,6 +114,7 @@ void APNEnemyBoss::ApplyDamage(float DamageAmount, AActor* DamageCauser, const F
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
+	StatComp->ApplyDamage(DamageAmount);
 }
 
 void APNEnemyBoss::SetDead()
@@ -121,6 +122,8 @@ void APNEnemyBoss::SetDead()
 	Super::SetDead();
 
 	GetMyController()->StopAI();
+	Anim->Montage_Play(DeadMontage);
+	SetActorEnableCollision(false);
 }
 
 void APNEnemyBoss::DisplayStatus()
@@ -130,8 +133,8 @@ void APNEnemyBoss::DisplayStatus()
 	{
 		BossStatusPtr->AddToViewport();
 
-		BossStatusPtr->SetMaxHp(1.f);
-		BossStatusPtr->UpdateHpBar(1.f);
+		BossStatusPtr->SetMaxHp(StatComp->GetMaxHp());
+		BossStatusPtr->UpdateHpBar(StatComp->GetMaxHp());
 		StatComp->OnHpChanged.AddUObject(BossStatusPtr, &UBossStatusWidget::UpdateHpBar);
 		
 	}
