@@ -22,5 +22,8 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference);
 
 private:
+	void MakeLineTrace(AActor* Owner);
 	bool CanComboAttack(AActor* Owner);
+
+	TSet<AActor*> Hits;
 };

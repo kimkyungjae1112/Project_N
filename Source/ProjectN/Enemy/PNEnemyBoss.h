@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/PNEnemyBase.h"
+#include "Interface/WeaponSocketCarryInterface.h"
+#include "Interface/BossAttackHitInterface.h"
 #include "PNEnemyBoss.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTN_API APNEnemyBoss : public APNEnemyBase
+class PROJECTN_API APNEnemyBoss : public APNEnemyBase, public IWeaponSocketCarryInterface, public IBossAttackHitInterface
 {
 	GENERATED_BODY()
 
@@ -38,6 +40,10 @@ public:
 
 	virtual void SetDead() override;
 
+	/* Weapon Socket Carry */
+	virtual class USkeletalMeshComponent* GetWeaponMeshComponent() override;
+	virtual uint8 GetCurrentCombo() override;
+
 	/* UI */
 	void DisplayStatus();
 
@@ -51,15 +57,20 @@ private:
 
 	void BeginMeleeAttack_3();
 	void EndMeleeAttack_3(class UAnimMontage* Target, bool IsProperlyEnded);
+	virtual void Attack_3_HitCheck() override;
 
 	void BeginMeleeAttack_4();
 	void EndMeleeAttack_4(class UAnimMontage* Target, bool IsProperlyEnded);
+	void Attack_4_MotionWarpSet();
+	virtual void Attack_4_HitCheck() override;
 
 	void BeginRangedAttack_1();
 	void EndRangedAttack_1(class UAnimMontage* Target, bool IsProperlyEnded);
+	virtual void Attack_5_HitCheck() override;
 
 	void BeginRangedAttack_2();
 	void EndRangedAttack_2(class UAnimMontage* Target, bool IsProperlyEnded);
+	virtual void Attack_6_HitCheck() override;
 
 /* 공격 관련 데이터 */
 private:

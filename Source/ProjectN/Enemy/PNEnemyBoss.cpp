@@ -8,6 +8,7 @@
 #include "MotionWarpingComponent.h"
 #include "Component/PNEnemyStatComponent.h"
 #include "UI/BossStatusWidget.h"
+#include "Engine/DamageEvents.h"
 
 APNEnemyBoss::APNEnemyBoss()
 {
@@ -126,6 +127,16 @@ void APNEnemyBoss::SetDead()
 	SetActorEnableCollision(false);
 }
 
+USkeletalMeshComponent* APNEnemyBoss::GetWeaponMeshComponent()
+{
+	return SwordMeshComp;
+}
+
+uint8 APNEnemyBoss::GetCurrentCombo()
+{
+	return Attack_1_Combo;
+}
+
 void APNEnemyBoss::DisplayStatus()
 {
 	BossStatusPtr = CreateWidget<UBossStatusWidget>(GetWorld(), BossStatusClass);
@@ -184,8 +195,27 @@ void APNEnemyBoss::EndMeleeAttack_3(UAnimMontage* Target, bool IsProperlyEnded)
 	OnAttack_3_Finished.ExecuteIfBound();
 }
 
+void APNEnemyBoss::Attack_3_HitCheck()
+{
+	FVector Origin = GetActorLocation() + FVector(100.f, 0.f, 50.f);
+	FVector End = Origin + GetActorForwardVector() * 100.f;
+	FVector BoxExtent = FVector(100.f);
+	
+	FHitResult HitResult;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
+	if (bHit)
+	{
+		// 넉백 효과를 넣고 싶은데
+		AActor* Target = HitResult.GetActor();
+		FDamageEvent DamageEvent;
+		Target->TakeDamage(300.f, DamageEvent, GetMyController(), this);
+	}
+}
+
 void APNEnemyBoss::BeginMeleeAttack_4()
 {
+	Attack_4_MotionWarpSet();
 	Anim->Montage_Play(MeleeAttack_4_Montage);
 
 	FOnMontageEnded MontageEnd;
@@ -196,6 +226,32 @@ void APNEnemyBoss::BeginMeleeAttack_4()
 void APNEnemyBoss::EndMeleeAttack_4(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	OnAttack_4_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::Attack_4_MotionWarpSet()
+{
+	FVector Origin = GetActorLocation();
+	FVector End = Origin + GetActorForwardVector() * 500.f;
+	MotionWarpComp->AddOrUpdateWarpTargetFromLocation(TEXT("Attack4"), End);
+}
+
+void APNEnemyBoss::Attack_4_HitCheck()
+{
+	FVector Origin = GetActorLocation();
+	FVector End = Origin - GetActorForwardVector() * 500.f;
+
+	FVector BoxExtent = FVector(100.f);
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params(NAME_None, false, this);
+	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
+	if (bHit)
+	{
+		// 넉백 효과를 넣고 싶은데
+		AActor* Target = HitResult.GetActor();
+		FDamageEvent DamageEvent;
+		Target->TakeDamage(300.f, DamageEvent, GetMyController(), this);
+	}
 }
 
 void APNEnemyBoss::BeginRangedAttack_1()
@@ -212,6 +268,10 @@ void APNEnemyBoss::EndRangedAttack_1(UAnimMontage* Target, bool IsProperlyEnded)
 	OnAttack_5_Finished.ExecuteIfBound();
 }
 
+void APNEnemyBoss::Attack_5_HitCheck()
+{
+}
+
 void APNEnemyBoss::BeginRangedAttack_2()
 {
 	Anim->Montage_Play(RangedAttack_2_Montage);
@@ -224,6 +284,10 @@ void APNEnemyBoss::BeginRangedAttack_2()
 void APNEnemyBoss::EndRangedAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	OnAttack_6_Finished.ExecuteIfBound();
+}
+
+void APNEnemyBoss::Attack_6_HitCheck()
+{
 }
 
 APNAIControllerBoss* APNEnemyBoss::GetMyController()

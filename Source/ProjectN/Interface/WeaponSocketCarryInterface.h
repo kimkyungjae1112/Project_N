@@ -22,4 +22,5 @@ class PROJECTN_API IWeaponSocketCarryInterface
 
 public:
 	virtual class USkeletalMeshComponent* GetWeaponMeshComponent() = 0;
+	virtual uint8 GetCurrentCombo() { return 0; }
 };
