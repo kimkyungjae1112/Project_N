@@ -17,4 +17,13 @@ class PROJECTN_API APNGameModeBase : public AGameModeBase
 public:
 	APNGameModeBase();
 
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Sound")
+	TObjectPtr<class UAudioComponent> BGMComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Sound")
+	TObjectPtr<class USoundWave> BGMAsset;
 };

@@ -2,6 +2,8 @@
 
 
 #include "Game/PNGameModeBase.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWave.h"
 
 APNGameModeBase::APNGameModeBase()
 {
@@ -15,4 +17,21 @@ APNGameModeBase::APNGameModeBase()
 	{
 		PlayerControllerClass = PlayerControllerClassRef.Class;
 	}
+
+	BGMComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	BGMComp->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FObjectFinder<USoundWave> BGMAssetRef(TEXT("/Script/Engine.SoundWave'/Game/Project_N/Sound/bgm029-dark-fantasy-horror-mystery-horror-148349.bgm029-dark-fantasy-horror-mystery-horror-148349'"));
+	if (BGMAssetRef.Object)
+	{
+		BGMAsset = BGMAssetRef.Object;
+	}
+}
+
+void APNGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BGMComp->SetSound(BGMAsset);
+	BGMComp->Play();
 }
