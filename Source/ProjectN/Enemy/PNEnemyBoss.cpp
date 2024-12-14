@@ -46,6 +46,8 @@ void APNEnemyBoss::BeginPlay()
 
 	Anim = GetMesh()->GetAnimInstance();
 	ensure(Anim);
+
+	GetMyController()->StopAI();
 }
 
 float APNEnemyBoss::GetMeleeAttackInRange()

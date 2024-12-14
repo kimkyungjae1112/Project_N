@@ -25,4 +25,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Comp")
 	TObjectPtr<class UBoxComponent> BoxComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Sequnce")
+	TSoftObjectPtr<class ULevelSequence> LevelSequenceAsset;
+
+	UPROPERTY(EditAnywhere, Category = "Sequnce")
+	TObjectPtr<class ULevelSequencePlayer> LevelSequencePlayer;
 };

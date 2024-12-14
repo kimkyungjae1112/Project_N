@@ -10,7 +10,7 @@ public class ProjectN : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "ProjectN" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule","GameplayTasks", "Niagara", "MotionWarping" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule","GameplayTasks", "Niagara", "MotionWarping", "LevelSequence", "MovieScene" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

@@ -17,7 +17,7 @@ APNThrone::APNThrone()
 		MainBodyComp->SetStaticMesh(MainBodyMeshRef.Object);
 	}
 	
-	static ConstructorHelpers::FClassFinder<UCameraShakeBase> CameraShakeClassRef(TEXT("/Script/Engine.Blueprint'/Game/Project_N/Blueprints/Gimmick/BP_CameraShake.BP_CameraShake'"));
+	static ConstructorHelpers::FClassFinder<UCameraShakeBase> CameraShakeClassRef(TEXT("/Game/Project_N/Blueprints/Gimmick/BP_CameraShake.BP_CameraShake_C"));
 	if (CameraShakeClass = CameraShakeClassRef.Class)
 	{
 		CameraShakeClass = CameraShakeClassRef.Class;
@@ -50,8 +50,8 @@ void APNThrone::Tick(float DeltaTime)
 	if (bActiveMove)
 	{
 		FVector Start = GetActorLocation();
-		FVector End = Origin - FVector(0.f, 0.f, 1000.f);
-		SetActorLocation(FMath::VInterpConstantTo(Start, End, DeltaTime, 350.f));
+		FVector End = Origin - FVector(0.f, 0.f, 5000.f);
+		SetActorLocation(FMath::VInterpTo(Start, End, DeltaTime, 0.3f));
 	}
 }
 

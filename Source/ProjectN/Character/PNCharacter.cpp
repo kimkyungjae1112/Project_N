@@ -30,6 +30,7 @@ APNCharacter::APNCharacter()
 	SpringArmComp->SetupAttachment(GetMesh());
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->TargetArmLength = 650.f;
+	SpringArmComp->bDoCollisionTest = true;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComp->SetupAttachment(SpringArmComp);
