@@ -4,32 +4,34 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PNActiveBoss.generated.h"
+#include "PNActiveStage.generated.h"
 
 UCLASS()
-class PROJECTN_API APNActiveBoss : public AActor
+class PROJECTN_API APNActiveStage : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	APNActiveBoss();
+	APNActiveStage();
 
 protected:
 	virtual void BeginPlay() override;
+
+public:	
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	UFUNCTION()
 	void OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void ActiveStage();
+	void CompleteQuest();
 
-private:
-	UPROPERTY(VisibleAnywhere, Category = "Comp")
+	UPROPERTY(VisibleAnywhere, Category = "Box")
 	TObjectPtr<class UBoxComponent> BoxComp;
 
-	UPROPERTY(VisibleAnywhere, Category = "Sequnce")
-	TSoftObjectPtr<class ULevelSequence> LevelSequenceAsset;
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TSubclassOf<class UUserWidget> UIClass;
 
-	UPROPERTY(EditAnywhere, Category = "Sequnce")
-	TObjectPtr<class ULevelSequencePlayer> LevelSequencePlayer;
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UUserWidget> UIPtr;
 };

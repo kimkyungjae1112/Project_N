@@ -7,6 +7,8 @@
 #include "Interface/EnemyCommonHpBarInterface.h"
 #include "PNEnemyCommonBase.generated.h"
 
+DECLARE_DELEGATE(FOnEnemyDead)
+
 /**
  * 
  */
@@ -26,7 +28,9 @@ public:
 	/* EnemyCommonHpBar Interface */
 	virtual void SetHpBar(class UEnemyHpBarWidget* InHpBar) override;
 
-	virtual void SetDead() override { }
+	virtual void SetDead() override;
+
+	static FOnEnemyDead OnEnemyDead;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effect")

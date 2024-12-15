@@ -154,6 +154,10 @@ void APNEnemyBoss::DisplayStatus()
 
 }
 
+void APNEnemyBoss::StartMotion()
+{
+}
+
 void APNEnemyBoss::BeginMeleeAttack_1()
 {
 	Attack_1_Combo = 1;

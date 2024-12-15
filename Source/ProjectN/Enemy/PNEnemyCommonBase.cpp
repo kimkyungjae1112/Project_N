@@ -7,6 +7,8 @@
 #include "UI/DamageTextWidget.h"
 #include "NiagaraComponent.h"
 
+FOnEnemyDead APNEnemyCommonBase::OnEnemyDead;
+
 APNEnemyCommonBase::APNEnemyCommonBase()
 {
 	HpBarWidgetComponent = CreateDefaultSubobject<UEnemyRefWidgetComponent>(TEXT("HpBarWidgetComponent"));
@@ -59,6 +61,11 @@ void APNEnemyCommonBase::SetHpBar(UEnemyHpBarWidget* InHpBar)
 		InHpBar->UpdateHpBar(StatComp->GetHp());
 		StatComp->OnHpChanged.AddUObject(InHpBar, &UEnemyHpBarWidget::UpdateHpBar);
 	}
+}
+
+void APNEnemyCommonBase::SetDead()
+{
+	OnEnemyDead.ExecuteIfBound();
 }
 
 void APNEnemyCommonBase::DisplayDamageTextUI(float Damage)

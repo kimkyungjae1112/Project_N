@@ -28,6 +28,7 @@ void UBTService_DetectToTarget::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	TArray<FOverlapResult> OverlapResults;
 	FVector Origin = Owner->GetActorLocation();
 	FCollisionQueryParams Params(NAME_None, false, Owner);
+	DrawDebugSphere(Owner->GetWorld(), Origin, Radius, 32, FColor::Red, false, 1.f);
 	bool bHit = Owner->GetWorld()->OverlapMultiByChannel(OverlapResults, Origin, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(Radius), Params);
 	if (bHit)
 	{

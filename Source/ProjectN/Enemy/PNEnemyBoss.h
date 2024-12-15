@@ -47,6 +47,9 @@ public:
 	/* UI */
 	void DisplayStatus();
 
+	/* Start Motion */
+	void StartMotion();
+
 /* 공격 */
 private:
 	void BeginMeleeAttack_1();
