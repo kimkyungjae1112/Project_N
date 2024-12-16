@@ -6,10 +6,12 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "Character/PNCharacter.h"
-#include "Kismet/GameplayStatics.h"
+#include "Perception/AIPerceptionComponent.h"
 
 APNAIControllerBase::APNAIControllerBase()
 {
+	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception"));
+	SetPerceptionComponent(*AIPerception);
 }
 
 void APNAIControllerBase::RunAI()

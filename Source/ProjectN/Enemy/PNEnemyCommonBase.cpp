@@ -6,6 +6,7 @@
 #include "UI/EnemyHpBarWidget.h"
 #include "UI/DamageTextWidget.h"
 #include "NiagaraComponent.h"
+#include "Perception/AISense_Damage.h"
 
 FOnEnemyDead APNEnemyCommonBase::OnEnemyDead;
 
@@ -47,6 +48,15 @@ void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, c
 
 	DisplayDamageTextUI(DamageAmount);
 
+	/* 대미지 입으면 감각 활성화 */
+	UAISense_Damage::ReportDamageEvent(
+		GetWorld(),
+		this,
+		DamageCauser,
+		DamageAmount,
+		GetActorLocation(),
+		(GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal()
+	);
 }
 
 void APNEnemyCommonBase::NextComboAttack()

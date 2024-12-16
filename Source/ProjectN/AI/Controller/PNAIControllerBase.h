@@ -6,6 +6,13 @@
 #include "AIController.h"
 #include "PNAIControllerBase.generated.h"
 
+UENUM()
+enum class EAIPerceptionSense : uint8
+{
+	EPS_None = 0,
+	EPS_Sight,
+	EPS_Damage
+};
 /**
  * 
  */
@@ -29,4 +36,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TObjectPtr<class UBehaviorTree> BTData;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAIPerceptionComponent> AIPerception;
 };

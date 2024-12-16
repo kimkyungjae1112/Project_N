@@ -79,6 +79,13 @@ private:
 private:
 	uint8 Attack_1_Combo = 0;
 
+/* 시작 모션 */
+private:
+	void BeginStartMotion();
+	void EndStartMotion(class UAnimMontage* Target, bool IsProperlyEnded);
+
+
+
 /* 유틸 */
 private:
 	class APNAIControllerBoss* GetMyController();
@@ -108,6 +115,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> StartMotionMontage;
 
 /* 컴포넌트 */
 private:

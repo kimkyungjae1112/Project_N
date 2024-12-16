@@ -59,8 +59,11 @@ void APNActiveBoss::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent,
 	APNEnemyBoss* BossPtr = Cast<APNEnemyBoss>(UGameplayStatics::GetActorOfClass(GetWorld(), APNEnemyBoss::StaticClass()));
 	if (BossPtr)
 	{
-		BossPtr->DisplayStatus();
-		BossPtr->StartMotion();
+		//BossPtr->DisplayStatus();
+
+		FTimerHandle StartMotionTimer;
+		GetWorld()->GetTimerManager().SetTimer(StartMotionTimer, BossPtr, &APNEnemyBoss::StartMotion, 10.f, false);
+		//BossPtr->StartMotion();
 	}
 
 	LevelSequencePlayer->Play();

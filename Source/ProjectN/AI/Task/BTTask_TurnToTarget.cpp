@@ -20,10 +20,10 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
 	if (Target == nullptr) return EBTNodeResult::Failed;
 
-	FVector Direct = (Target->GetActorLocation() - Owner->GetActorLocation()).GetSafeNormal();
+	FVector Direct = Target->GetActorLocation() - Owner->GetActorLocation();
 	Direct.Z = 0.f;
 	FRotator Rot = FRotationMatrix::MakeFromX(Direct).Rotator();
-	Owner->SetActorRotation(FMath::RInterpConstantTo(Owner->GetActorRotation(), Rot, Owner->GetWorld()->GetDeltaSeconds(), 2.f));
+	Owner->SetActorRotation(FMath::RInterpTo(Owner->GetActorRotation(), Rot, GetWorld()->GetDeltaSeconds(), 2.f));
 
 	return EBTNodeResult::Succeeded;
 }

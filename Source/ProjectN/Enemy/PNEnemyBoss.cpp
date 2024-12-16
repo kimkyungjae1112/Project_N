@@ -156,6 +156,7 @@ void APNEnemyBoss::DisplayStatus()
 
 void APNEnemyBoss::StartMotion()
 {
+	BeginStartMotion();
 }
 
 void APNEnemyBoss::BeginMeleeAttack_1()
@@ -294,6 +295,21 @@ void APNEnemyBoss::EndRangedAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
 
 void APNEnemyBoss::Attack_6_HitCheck()
 {
+}
+
+void APNEnemyBoss::BeginStartMotion()
+{
+	Anim->Montage_Play(StartMotionMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyBoss::EndStartMotion);
+	Anim->Montage_SetEndDelegate(MontageEnd, StartMotionMontage);
+}
+
+void APNEnemyBoss::EndStartMotion(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	GetMyController()->RunAI();
+	DisplayStatus();
 }
 
 APNAIControllerBoss* APNEnemyBoss::GetMyController()

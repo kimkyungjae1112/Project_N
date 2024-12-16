@@ -65,6 +65,11 @@ private:
 	void BeginDefaultAttack();
 	void EndDefaultAttack(class UAnimMontage* Target, bool IsProperlyEnded);
 
+/* 피격 */
+private:
+	void BeginHurt(const FName& DamageType, const FVector& ImpactLocation);
+	void EndHurt(class UAnimMontage* Target, bool bIsProperlyEnded);
+
 /* 공격 관련 데이터 */
 private:
 	uint8 DefaultAttackCombo;

@@ -46,12 +46,6 @@ APNCharacter::APNCharacter()
 
 	SheathMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Sheath"));
 	SheathMeshComp->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
-	SheathMeshComp->SetVisibility(false);
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SheathMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/ARPG_Samurai/Demo/Weapon/Mesh/scabbard.scabbard'"));
-	if (SheathMeshRef.Object)
-	{
-		SheathMeshComp->SetSkeletalMesh(SheathMeshRef.Object);
-	}
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MainMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Project_N/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'"));
 	if (MainMeshRef.Object)
@@ -167,6 +161,8 @@ APNCharacter::APNCharacter()
 	BattleSystemComp->InitBehaviorState.AddUObject(this, &APNCharacter::Walk);
 
 	CurrentBehaviorState = EBehaviorState::EWalk;
+
+	Tags.Add(TEXT("Player"));
 }
 
 void APNCharacter::BeginPlay()
