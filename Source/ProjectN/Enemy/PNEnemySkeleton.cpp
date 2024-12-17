@@ -71,7 +71,10 @@ void APNEnemySkeleton::ApplyDamage(float DamageAmount, AActor* DamageCauser, con
 	ImpactNiagaraComop->SetAsset(DefaultImpactNiagara);
 	ImpactNiagaraComop->Activate();
 
-	BeginHurt(DamageType, ImpactLocation);
+	if (!Anim->Montage_IsPlaying(CurrentWeaponMontages[0]))
+	{
+		BeginHurt(DamageType, ImpactLocation);
+	}
 	
 
 	StatComp->ApplyDamage(DamageAmount);
@@ -135,42 +138,60 @@ void APNEnemySkeleton::EndDefaultAttack(UAnimMontage* Target, bool IsProperlyEnd
 
 void APNEnemySkeleton::BeginHurt(const FName& DamageType, const FVector& ImpactLocation)
 {
-	if (DamageType == TEXT("Light"))
+	if (DamageType == TEXT("Light") || DamageType == TEXT("Dash"))
 	{
 		FVector ForwardVector = GetActorForwardVector();
+		FVector RightVector = GetActorRightVector();
 		FVector ImpactDirection = (ImpactLocation - GetActorLocation()).GetSafeNormal();
+		
+		// Dot Product 계산
+		float ForwardDot = FVector::DotProduct(ForwardVector, ImpactDirection);
+		float RightDot = FVector::DotProduct(RightVector, ImpactDirection);
 
-		float ForwardDot = FVector::DotProduct(GetActorForwardVector(), ImpactDirection);
-
-		//왼쪽 오른쪽
-		/*FVector RightVector = GetActorRightVector();
-		float RightDot = FVector::DotProduct(RightVector, ImpactDirection);*/
-
-		GetMyController()->StopAI();
-		Anim->StopAllMontages(1.f);
 		Anim->Montage_Play(CurrentWeaponMontages[2]);
-	
-		FOnMontageEnded MontageEnd;
-		MontageEnd.BindUObject(this, &APNEnemySkeleton::EndHurt);
-		Anim->Montage_SetEndDelegate(MontageEnd, CurrentWeaponMontages[2]);
 
-		//몬스터가 두대 맞아야지 정신차림
+		//몬스터가 두대 맞아야지 정신차림 -> 2024 12 17 해결 / 몽타주의 Enable auto blend out 체크
 
-		/*if (ForwardDot > 0)
-		{		
-			Anim->Montage_JumpToSection(TEXT("LightF"), CurrentWeaponMontages[2]);	
+		if (FMath::Abs(ForwardDot) > FMath::Abs(RightDot))
+		{
+			if (ForwardDot > 0)
+			{
+				Anim->Montage_JumpToSection(TEXT("LightF"), CurrentWeaponMontages[2]);
+			}
+			else
+			{
+				Anim->Montage_JumpToSection(TEXT("LightB"), CurrentWeaponMontages[2]);
+			}
 		}
 		else
 		{
-			Anim->Montage_JumpToSection(TEXT("LightB"), CurrentWeaponMontages[2]);
-		}*/
+			if (RightDot > 0)
+			{
+				Anim->Montage_JumpToSection(TEXT("LightR"), CurrentWeaponMontages[2]);
+			}
+			else
+			{
+				Anim->Montage_JumpToSection(TEXT("LightL"), CurrentWeaponMontages[2]);
+			}
+		}
 	}
+	else if (DamageType == TEXT("Charge"))
+	{
+		GetMyController()->StopAI();
+		Anim->Montage_Play(CurrentWeaponMontages[3]);
 
+		FOnMontageEnded MontageEnd;
+		MontageEnd.BindUObject(this, &APNEnemySkeleton::EndHurt);
+		Anim->Montage_SetEndDelegate(MontageEnd, CurrentWeaponMontages[3]);
+	}
 	
 }
 
-void APNEnemySkeleton::EndHurt(UAnimMontage* Target, bool bIsProperlyEnded)
+void APNEnemySkeleton::EndHurt(UAnimMontage* Target, bool IsProperlyEnded)
 {
-	UE_LOG(LogTemp, Display, TEXT("공격 히트 애니메이션 끝남"));
-	GetMyController()->RunAI();
+	if (StatComp->GetHp() > 0.f)
+	{
+		GetMyController()->RunAI();
+	}
 }
+

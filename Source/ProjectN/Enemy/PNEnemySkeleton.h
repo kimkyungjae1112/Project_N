@@ -68,7 +68,7 @@ private:
 /* 피격 */
 private:
 	void BeginHurt(const FName& DamageType, const FVector& ImpactLocation);
-	void EndHurt(class UAnimMontage* Target, bool bIsProperlyEnded);
+	void EndHurt(class UAnimMontage* Target, bool IsProperlyEnded);
 
 /* 공격 관련 데이터 */
 private:
