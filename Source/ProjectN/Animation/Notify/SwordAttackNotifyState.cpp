@@ -16,7 +16,10 @@ void USwordAttackNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 void USwordAttackNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
-
+	
+	//계속 누르고 있ㅇ므ㅕㄴ 
+	PressTime += FrameDeltaTime;
+	
 }
 
 void USwordAttackNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

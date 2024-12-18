@@ -30,7 +30,6 @@ EBTNodeResult::Type UBTTask_Attack1::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 
 	Interface->SetAttack_1_Delegate(OnAttack_1_Finished);
 	Interface->Attack_1();
-	UE_LOG(LogTemp, Display, TEXT("공격"));
 
 	return EBTNodeResult::InProgress;
 }

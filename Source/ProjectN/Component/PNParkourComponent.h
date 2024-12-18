@@ -39,6 +39,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Character")
 	TObjectPtr<class UAnimInstance> Anim;
 
+	UPROPERTY(VisibleAnywhere, Category = "Stat")
+	TObjectPtr<class UPNPlayerStatComponent> StatComp;
+
+	bool bIsRun = false;
+
 /* 몽타주 */
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage")

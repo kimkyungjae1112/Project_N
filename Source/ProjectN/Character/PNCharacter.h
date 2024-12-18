@@ -50,6 +50,7 @@ public:
 	
 public:
 	FORCEINLINE bool GetIsCharge() { return IsCharge; }
+	FORCEINLINE void SetAfterAttack(bool Flag) { bAfterAttack = Flag; }
 	FORCEINLINE USkeletalMeshComponent* GetWeapon() { return SwordMeshComp; }
 
 public:
@@ -79,6 +80,9 @@ private:
 	void SetBehaviorStateJump();
 	void SetBehaviorStateNonCombat();
 
+	void SetDead();
+	void SetStun();
+
 /* Input System */
 private:
 	void Move(const FInputActionValue& Value);
@@ -91,6 +95,7 @@ private:
 	void MouseRightAttack();
 	float PressTime = 0.f;
 	bool IsCharge = false;
+	bool bAfterAttack = false;
 
 	void Run();
 	void Walk();

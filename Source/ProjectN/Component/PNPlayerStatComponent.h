@@ -9,6 +9,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChanged, float /* Current Hp */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnergyChanged, float /* Current Energy */);
 DECLARE_MULTICAST_DELEGATE(FOnHpZero);
+DECLARE_MULTICAST_DELEGATE(FOnEnergyZero);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PROJECTN_API UPNPlayerStatComponent : public UActorComponent
@@ -27,6 +28,7 @@ public:
 	FOnHpChanged OnHpChanged;
 	FOnEnergyChanged OnEnergyChanged;
 	FOnHpZero OnHpZero;
+	FOnEnergyZero OnEnergyZero;
 
 	FORCEINLINE float GetMaxHp() const { return MaxHp; }
 	FORCEINLINE float GetHp() const { return Hp; }

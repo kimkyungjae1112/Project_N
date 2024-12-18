@@ -156,6 +156,8 @@ APNCharacter::APNCharacter()
 	ParkourComp = CreateDefaultSubobject<UPNParkourComponent>(TEXT("Parkour Component"));
 	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarp Component"));
 	StatComp = CreateDefaultSubobject<UPNPlayerStatComponent>(TEXT("Stat Component"));
+	StatComp->OnHpZero.AddUObject(this, &APNCharacter::SetDead);
+	StatComp->OnEnergyZero.AddUObject(this, &APNCharacter::SetStun);
 
 	/* 델리게이트 */
 	BattleSystemComp->InitBehaviorState.AddUObject(this, &APNCharacter::Walk);
@@ -276,6 +278,16 @@ void APNCharacter::SetBehaviorStateNonCombat()
 	}
 }
 
+void APNCharacter::SetDead()
+{
+
+}
+
+void APNCharacter::SetStun()
+{
+	BattleSystemComp->BeginStun();
+}
+
 void APNCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D InputValue = Value.Get<FVector2D>();
@@ -322,6 +334,12 @@ void APNCharacter::MouseLeftAttack()
 void APNCharacter::MouseLeftAttackRelease()
 {
 	IsCharge = false;
+
+	if (bAfterAttack)
+	{
+		BattleSystemComp->NoCharge();
+		bAfterAttack = false;
+	}
 }
 
 void APNCharacter::MouseLeftChargeAttack()

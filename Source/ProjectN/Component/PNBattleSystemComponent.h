@@ -38,6 +38,8 @@ public:
 
 /* 공격 */
 public:
+	/* 차지 멈추기 */
+	void NoCharge();
 	/* 좌클릭 눌렀을 때 실행되는 함수 */
 	void Attack();
 	/* 우클릭 눌렀을 때 실행되는 함수 */
@@ -62,13 +64,16 @@ public:
 	/* Block */
 	void BeginBlock();
 	void EndBlock();
-	
+
 	/* Attacked */
 	void BeginBlockAttacked();
 	void BeginAttacked();
 
 	/* Change Non Combat */
 	void BeginChangeNonCombat();
+
+	/* Stun */
+	void BeginStun();
 
 private:
 	/* 차징 */
@@ -114,6 +119,9 @@ private:
 
 	/* Change Non Combat */
 	void EndChangeNonCombat(class UAnimMontage* Target, bool IsProperlyEnded);
+
+	/* Stun */
+	void EndStun(class UAnimMontage* Target, bool IsProperlyEnded);
 
 /* UI */
 private:
@@ -171,4 +179,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> WeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> StunMontage;
 };

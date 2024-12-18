@@ -8,6 +8,7 @@
 #include "Animation/AnimMontage.h"
 #include "Components/CapsuleComponent.h"
 #include "MotionWarpingComponent.h"
+#include "Component/PNPlayerStatComponent.h"
 
 UPNParkourComponent::UPNParkourComponent()
 {
@@ -25,6 +26,8 @@ void UPNParkourComponent::BeginPlay()
 	{
 		Anim = Character->GetMesh()->GetAnimInstance();
 	}
+
+	StatComp = GetOwner()->GetComponentByClass<UPNPlayerStatComponent>();
 }
 
 
@@ -32,16 +35,22 @@ void UPNParkourComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (bIsRun)
+	{
+		StatComp->ApplyEnergy(1.f);
+	}
 }
 
 void UPNParkourComponent::Run()
 {
 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	bIsRun = true;
 }
 
 void UPNParkourComponent::Walk()
 {
 	Character->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	bIsRun = false;
 }
 
 void UPNParkourComponent::Crouch()
@@ -62,6 +71,7 @@ void UPNParkourComponent::UnCrouch()
 
 void UPNParkourComponent::BeginRoll()
 {
+	StatComp->ApplyEnergy(20.f);
 	RollMotionWarpSet();
 	Anim->Montage_Play(RollMontage);
 	//Character->GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));

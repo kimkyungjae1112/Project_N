@@ -12,7 +12,7 @@ UAttackStartNotify::UAttackStartNotify()
 void UAttackStartNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-
+	
 	APNCharacter* Player = Cast<APNCharacter>(MeshComp->GetOwner());
 	if (Player)
 	{
@@ -27,4 +27,5 @@ void UAttackStartNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceB
 			BSComp->FailCharge();
 		}
 	}
+	Player->SetAfterAttack(true);
 }

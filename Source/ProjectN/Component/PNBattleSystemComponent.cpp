@@ -61,7 +61,10 @@ void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UPNBattleSystemComponent::Charge()
 {
-	Anim->Montage_Play(ChargeMontage);
+	if (!Anim->Montage_IsPlaying(ChargeMontage))
+	{
+		Anim->Montage_Play(ChargeMontage);
+	}
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndCharge);
@@ -70,6 +73,16 @@ void UPNBattleSystemComponent::Charge()
 
 void UPNBattleSystemComponent::EndCharge(UAnimMontage* Target, bool IsProperlyEnded)
 {
+	if (CurrentAttackState == EAttackState::ASCharge)
+	{
+		CurrentAttackState = EAttackState::ASIdle;
+	}
+}
+
+void UPNBattleSystemComponent::NoCharge()
+{
+	Anim->Montage_Stop(0.3f, ChargeMontage);
+
 	if (CurrentAttackState == EAttackState::ASCharge)
 	{
 		CurrentAttackState = EAttackState::ASIdle;
@@ -130,7 +143,7 @@ void UPNBattleSystemComponent::FailCharge()
 void UPNBattleSystemComponent::LightAttack()
 {
 	CurrentLightAttackCombo = 1;
-	StatComp->ApplyEnergy(10.f);
+	StatComp->ApplyEnergy(StatComp->UseLightAttackEnergy());
 	Anim->Montage_Play(AttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -167,7 +180,7 @@ void UPNBattleSystemComponent::CheckTimerLightAttack()
 	LightAttackTimer.Invalidate();
 	if (HasNextLightAttack)
 	{
-		StatComp->ApplyEnergy(10.f);
+		StatComp->ApplyEnergy(StatComp->UseLightAttackEnergy());
 		CurrentLightAttackCombo = FMath::Clamp(CurrentLightAttackCombo + 1, 1, ComboData->MaxCombo[EAttackMontage::Light]);
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->SectionName[EAttackMontage::Light], CurrentLightAttackCombo);
 		Anim->Montage_JumpToSection(NextSection, AttackMontage);
@@ -194,7 +207,7 @@ void UPNBattleSystemComponent::BeginDashAttack()
 
 	CurrentAttackState = EAttackState::ASDash;
 
-	StatComp->ApplyEnergy(20.f);
+	StatComp->ApplyEnergy(StatComp->UseDashAttackEnergy());
 	Anim->Montage_Play(DashAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -237,6 +250,7 @@ void UPNBattleSystemComponent::BeginBlockAttacked()
 
 void UPNBattleSystemComponent::BeginAttacked()
 {
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	Anim->Montage_Play(AttackedMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -267,6 +281,17 @@ void UPNBattleSystemComponent::BeginChangeNonCombat()
 
 	
 	
+}
+
+void UPNBattleSystemComponent::BeginStun()
+{
+	UE_LOG(LogTemp, Display, TEXT("스턴 실행"));
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	Anim->Montage_Play(StunMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndStun);
+	Anim->Montage_SetEndDelegate(MontageEnd, StunMontage);
 }
 
 void UPNBattleSystemComponent::EndChargeAttack(UAnimMontage* Target, bool IsProperlyEnded)
@@ -333,7 +358,7 @@ void UPNBattleSystemComponent::AssassinationMotionWarpSet()
 void UPNBattleSystemComponent::BeginHeavyAttack()
 {
 	CurrentHeavyAttackCombo = 1;
-	StatComp->ApplyEnergy(15.f);
+	StatComp->ApplyEnergy(StatComp->UseHeavyAttackEnergy());
 	Anim->Montage_Play(HeavyAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -367,7 +392,7 @@ void UPNBattleSystemComponent::CheckTimerHeavyAttack()
 	HeavyAttackTimer.Invalidate();
 	if (HasNextHeavyAttack)
 	{
-		StatComp->ApplyEnergy(15.f);
+		StatComp->ApplyEnergy(StatComp->UseHeavyAttackEnergy());
 		CurrentHeavyAttackCombo = FMath::Clamp(CurrentHeavyAttackCombo + 1, 1, ComboData->MaxCombo[EAttackMontage::Heavy]);
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->SectionName[EAttackMontage::Heavy], CurrentHeavyAttackCombo);
 		Anim->Montage_JumpToSection(NextSection, HeavyAttackMontage);
@@ -383,9 +408,16 @@ void UPNBattleSystemComponent::EndBlockAttacked(UAnimMontage* Target, bool IsPro
 
 void UPNBattleSystemComponent::EndAttacked(UAnimMontage* Target, bool IsProperlyEnded)
 {
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
 void UPNBattleSystemComponent::EndChangeNonCombat(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UPNBattleSystemComponent::EndStun(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	StatComp->ApplyEnergy(StatComp->GetMaxEnergy());
 }
