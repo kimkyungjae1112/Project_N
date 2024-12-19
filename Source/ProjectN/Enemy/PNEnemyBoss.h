@@ -19,6 +19,9 @@ class PROJECTN_API APNEnemyBoss : public APNEnemyBase, public IWeaponSocketCarry
 public:
 	APNEnemyBoss();
 
+	UFUNCTION(BlueprintCallable)
+	void TestStart();
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -60,6 +63,7 @@ private:
 
 	void BeginMeleeAttack_3();
 	void EndMeleeAttack_3(class UAnimMontage* Target, bool IsProperlyEnded);
+	void Attack_3_MotionWarpSet();
 	virtual void Attack_3_HitCheck() override;
 
 	void BeginMeleeAttack_4();

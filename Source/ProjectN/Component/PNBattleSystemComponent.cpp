@@ -258,6 +258,11 @@ void UPNBattleSystemComponent::BeginAttacked()
 	Anim->Montage_SetEndDelegate(MontageEnd, AttackedMontage);
 }
 
+void UPNBattleSystemComponent::BeginKnockBackAttacked()
+{
+	Anim->Montage_Play(KnockBackMontage);
+}
+
 void UPNBattleSystemComponent::BeginChangeNonCombat()
 {
 	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
@@ -285,6 +290,7 @@ void UPNBattleSystemComponent::BeginChangeNonCombat()
 
 void UPNBattleSystemComponent::BeginStun()
 {
+	if (Anim->Montage_IsPlaying(StunMontage)) return;
 	UE_LOG(LogTemp, Display, TEXT("스턴 실행"));
 	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	Anim->Montage_Play(StunMontage);
@@ -409,6 +415,10 @@ void UPNBattleSystemComponent::EndBlockAttacked(UAnimMontage* Target, bool IsPro
 void UPNBattleSystemComponent::EndAttacked(UAnimMontage* Target, bool IsProperlyEnded)
 {
 	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void UPNBattleSystemComponent::EndKnockBackAttacked(UAnimMontage* Target, bool IsProperlyEnded)
+{
 }
 
 void UPNBattleSystemComponent::EndChangeNonCombat(UAnimMontage* Target, bool IsProperlyEnded)

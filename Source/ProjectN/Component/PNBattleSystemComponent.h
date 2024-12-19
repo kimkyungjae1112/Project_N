@@ -68,6 +68,7 @@ public:
 	/* Attacked */
 	void BeginBlockAttacked();
 	void BeginAttacked();
+	void BeginKnockBackAttacked();
 
 	/* Change Non Combat */
 	void BeginChangeNonCombat();
@@ -116,6 +117,7 @@ private:
 	/* Attacked */
 	void EndBlockAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
 	void EndAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
+	void EndKnockBackAttacked(class UAnimMontage* Target, bool IsProperlyEnded);
 
 	/* Change Non Combat */
 	void EndChangeNonCombat(class UAnimMontage* Target, bool IsProperlyEnded);
@@ -182,4 +184,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> StunMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> KnockBackMontage;
 };

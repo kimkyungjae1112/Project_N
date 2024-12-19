@@ -228,6 +228,11 @@ USkeletalMeshComponent* APNCharacter::GetWeaponMeshComponent()
 	return SwordMeshComp;
 }
 
+void APNCharacter::HitReaction()
+{
+	BattleSystemComp->BeginKnockBackAttacked();
+}
+
 void APNCharacter::SetBehaviorState(const EBehaviorState& BehaviorState)
 {
 	ChangeBehaviorStateMap[BehaviorState].ChangeBehaviorState.ExecuteIfBound();

@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "Interface/HUDInterface.h"
 #include "Interface/WeaponSocketCarryInterface.h"
+#include "Interface/PlayerApplyDamageInterface.h"
 #include "PNCharacter.generated.h"
 
 DECLARE_DELEGATE(FChangeBehaviorState)
@@ -35,7 +36,7 @@ struct FChangeBehaviorStateWarpper //상태 변화
  * 
  */
 UCLASS()
-class PROJECTN_API APNCharacter : public APNCharacterBase, public IHUDInterface, public IWeaponSocketCarryInterface
+class PROJECTN_API APNCharacter : public APNCharacterBase, public IHUDInterface, public IWeaponSocketCarryInterface, public IPlayerApplyDamageInterface
 {
 	GENERATED_BODY()
 	
@@ -58,7 +59,11 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	/* IWeaponSocketCarryInterface */
 	virtual class USkeletalMeshComponent* GetWeaponMeshComponent() override;
+
+	/* IPlayerApplyDamageInterface -> 특정 공격을 받았을 때 */
+	virtual void HitReaction() override;
 
 /* Camera */
 private:

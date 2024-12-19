@@ -9,6 +9,7 @@
 #include "Component/PNEnemyStatComponent.h"
 #include "UI/BossStatusWidget.h"
 #include "Engine/DamageEvents.h"
+#include "Interface/PlayerApplyDamageInterface.h"
 
 APNEnemyBoss::APNEnemyBoss()
 {
@@ -38,6 +39,11 @@ APNEnemyBoss::APNEnemyBoss()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+}
+
+void APNEnemyBoss::TestStart()
+{
+	GetMyController()->RunAI();
 }
 
 void APNEnemyBoss::BeginPlay()
@@ -149,7 +155,7 @@ void APNEnemyBoss::DisplayStatus()
 		BossStatusPtr->SetMaxHp(StatComp->GetMaxHp());
 		BossStatusPtr->UpdateHpBar(StatComp->GetMaxHp());
 		StatComp->OnHpChanged.AddUObject(BossStatusPtr, &UBossStatusWidget::UpdateHpBar);
-		
+
 	}
 
 }
@@ -190,6 +196,7 @@ void APNEnemyBoss::EndMeleeAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
 
 void APNEnemyBoss::BeginMeleeAttack_3()
 {
+	Attack_3_MotionWarpSet();
 	Anim->Montage_Play(MeleeAttack_3_Montage);
 
 	FOnMontageEnded MontageEnd;
@@ -202,14 +209,28 @@ void APNEnemyBoss::EndMeleeAttack_3(UAnimMontage* Target, bool IsProperlyEnded)
 	OnAttack_3_Finished.ExecuteIfBound();
 }
 
+void APNEnemyBoss::Attack_3_MotionWarpSet()
+{
+	FVector Origin = GetActorLocation();
+	FVector End = Origin + GetActorForwardVector() * 250.f;
+	MotionWarpComp->AddOrUpdateWarpTargetFromLocation(TEXT("Attack3"), End);
+}
+
 void APNEnemyBoss::Attack_3_HitCheck()
 {
 	FVector Origin = GetActorLocation() + FVector(100.f, 0.f, 50.f);
 	FVector End = Origin + GetActorForwardVector() * 100.f;
 	FVector BoxExtent = FVector(100.f);
-	
+
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
+
+	DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f);
+	DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f);
+
+	// 히트 경로를 선으로 디버깅
+	DrawDebugLine(GetWorld(), Origin, End, FColor::Blue, false, 1.f, 0, 2.f);
+
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
 	if (bHit)
 	{
@@ -217,6 +238,12 @@ void APNEnemyBoss::Attack_3_HitCheck()
 		AActor* Target = HitResult.GetActor();
 		FDamageEvent DamageEvent;
 		Target->TakeDamage(300.f, DamageEvent, GetMyController(), this);
+
+		IPlayerApplyDamageInterface* Interface = Cast<IPlayerApplyDamageInterface>(Target);
+		if (Interface)
+		{
+			Interface->HitReaction();
+		}
 	}
 }
 
@@ -238,23 +265,26 @@ void APNEnemyBoss::EndMeleeAttack_4(UAnimMontage* Target, bool IsProperlyEnded)
 void APNEnemyBoss::Attack_4_MotionWarpSet()
 {
 	FVector Origin = GetActorLocation();
-	FVector End = Origin + GetActorForwardVector() * 500.f;
+	FVector End = Origin + GetActorForwardVector() * 1000.f;
 	MotionWarpComp->AddOrUpdateWarpTargetFromLocation(TEXT("Attack4"), End);
 }
 
 void APNEnemyBoss::Attack_4_HitCheck()
 {
 	FVector Origin = GetActorLocation();
-	FVector End = Origin - GetActorForwardVector() * 500.f;
+	FVector End = Origin - GetActorForwardVector() * 1000.f;
 
 	FVector BoxExtent = FVector(100.f);
 
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
+	
+	DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f); // 시작 위치
+	DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f); // 끝 위치
+
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
 	if (bHit)
 	{
-		// 넉백 효과를 넣고 싶은데
 		AActor* Target = HitResult.GetActor();
 		FDamageEvent DamageEvent;
 		Target->TakeDamage(300.f, DamageEvent, GetMyController(), this);

@@ -31,12 +31,12 @@ void UBTService_DetectDistanceToTarget::TickNode(UBehaviorTreeComponent& OwnerCo
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("TargetInMeleeAttack"), true);
 
-		bool DebugFlag = false;
+		bool DebugFlag = true;
 		if (DebugFlag)
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack1"), false);
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack2"), true);
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack3"), false);
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack2"), false);
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack3"), true);
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack4"), false);
 			return;
 		}
@@ -79,19 +79,19 @@ void UBTService_DetectDistanceToTarget::TickNode(UBehaviorTreeComponent& OwnerCo
 		if (Distance >= 800.f)
 		{
 			int32 RandomIndex = FMath::RandRange(0, 10);
-			if (RandomIndex >= 0 && RandomIndex <= 3)
+			if (RandomIndex >= 0 && RandomIndex <= 1)
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack1"), true);
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack2"), false);
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack3"), false);
 			}
-			else if (RandomIndex >= 4 && RandomIndex <= 6)
+			else if (RandomIndex >= 2 && RandomIndex <= 3)
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack1"), false);
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack2"), true);
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack3"), false);
 			}
-			else if (RandomIndex >= 7 && RandomIndex <= 10)
+			else if (RandomIndex >= 4 && RandomIndex <= 10)
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack1"), false);
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("RangedAttack2"), false);

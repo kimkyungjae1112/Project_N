@@ -51,7 +51,9 @@ void UPNPlayerStatComponent::ApplyEnergy(float InEnergy)
 	SetEnergy(PrevEnergy - ActualEnergy);
 	if (Energy < KINDA_SMALL_NUMBER)
 	{
-		OnEnergyZero.Broadcast();
+		UE_LOG(LogTemp, Display, TEXT("신호날리기"));
+
+		//OnEnergyZero.Broadcast();
 	}
 }
 

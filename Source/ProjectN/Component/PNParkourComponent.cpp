@@ -37,7 +37,7 @@ void UPNParkourComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	if (bIsRun)
 	{
-		StatComp->ApplyEnergy(1.f);
+		StatComp->ApplyEnergy(0.1f);
 	}
 }
 
