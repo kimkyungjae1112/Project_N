@@ -31,6 +31,7 @@ public:
 	virtual class APNAIControllerBase* GetAIController() override;
 
 	virtual void NextComboAttack() override;
+	virtual void FirstDetectPlayer() override;
 
 	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;

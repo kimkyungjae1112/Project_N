@@ -13,6 +13,7 @@ UPNAnimInstance::UPNAnimInstance()
 	bIsBlock = false;
 	bIsCrouch = false;
 	bIsNoWeapon = false;
+	bIsDetectPlayer = false;
 }
 
 void UPNAnimInstance::NativeInitializeAnimation()

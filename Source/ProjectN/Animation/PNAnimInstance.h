@@ -54,6 +54,9 @@ public:
 	uint8 bIsNoWeapon : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	uint8 bIsDetectPlayer : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
 	FVector Velocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")

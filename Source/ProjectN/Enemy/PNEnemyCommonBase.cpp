@@ -63,6 +63,10 @@ void APNEnemyCommonBase::NextComboAttack()
 {
 }
 
+void APNEnemyCommonBase::FirstDetectPlayer()
+{
+}
+
 void APNEnemyCommonBase::SetHpBar(UEnemyHpBarWidget* InHpBar)
 {
 	if (InHpBar)

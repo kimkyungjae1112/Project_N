@@ -23,9 +23,9 @@ APNAIControllerSkeleton::APNAIControllerSkeleton()
 	}
 
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = 1500.f;
+	SightConfig->SightRadius = 500.f;
 	SightConfig->LoseSightRadius = 2000.f;
-	SightConfig->PeripheralVisionAngleDegrees = 270.f;
+	SightConfig->PeripheralVisionAngleDegrees = 360.f;
 	SightConfig->SetMaxAge(5.f);
 	SightConfig->AutoSuccessRangeFromLastSeenLocation = -1.f;
 
@@ -99,6 +99,7 @@ void APNAIControllerSkeleton::HandleSenseSight(AActor* Actor, const FAIStimulus&
 {
 	if (AIStimulus.WasSuccessfullySensed())
 	{
+		GetBlackboardComponent()->SetValueAsBool(TEXT("IsDetect"), true);
 		GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Actor);
 	}
 	else

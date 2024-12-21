@@ -31,7 +31,7 @@ void UBTService_DetectDistanceToTarget::TickNode(UBehaviorTreeComponent& OwnerCo
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("TargetInMeleeAttack"), true);
 
-		bool DebugFlag = true;
+		bool DebugFlag = false;
 		if (DebugFlag)
 		{
 			OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("MeleeAttack1"), false);

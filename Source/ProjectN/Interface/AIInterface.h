@@ -47,4 +47,6 @@ public:
 	virtual class APNAIControllerBase* GetAIController() = 0;
 
 	virtual void NextComboAttack() = 0;
+
+	virtual void FirstDetectPlayer() = 0;
 };

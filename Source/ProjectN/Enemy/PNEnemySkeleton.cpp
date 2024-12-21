@@ -5,7 +5,7 @@
 #include "AI/Controller/PNAIControllerSkeleton.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Animation/AnimInstance.h"
+#include "Animation/PNAnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -61,6 +61,16 @@ APNAIControllerBase* APNEnemySkeleton::GetAIController()
 
 void APNEnemySkeleton::NextComboAttack()
 {
+}
+
+void APNEnemySkeleton::FirstDetectPlayer()
+{
+	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
+	if (PNAnim)
+	{
+		PNAnim->bIsDetectPlayer = true;
+		PNAnim->Montage_Play(CurrentWeaponMontages[4]);
+	}
 }
 
 void APNEnemySkeleton::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
