@@ -7,11 +7,15 @@
 #include "UI/DamageTextWidget.h"
 #include "NiagaraComponent.h"
 #include "Perception/AISense_Damage.h"
+#include "Components/SphereComponent.h"
+#include "Engine/OverlapResult.h"
 
 FOnEnemyDead APNEnemyCommonBase::OnEnemyDead;
 
 APNEnemyCommonBase::APNEnemyCommonBase()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	HpBarWidgetComponent = CreateDefaultSubobject<UEnemyRefWidgetComponent>(TEXT("HpBarWidgetComponent"));
 	HpBarWidgetComponent->SetupAttachment(GetMesh());
 	HpBarWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
@@ -40,6 +44,11 @@ APNEnemyCommonBase::APNEnemyCommonBase()
 
 	ImpactNiagaraComop = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Impact Niagara Component"));
 	ImpactNiagaraComop->SetupAttachment(GetMesh());
+
+	FirstDetectSphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
+	FirstDetectSphereComp->SetupAttachment(GetMesh());
+	FirstDetectSphereComp->SetCollisionProfileName(TEXT("ActiveTrigger"));
+
 }
 
 void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
@@ -57,13 +66,11 @@ void APNEnemyCommonBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, c
 		GetActorLocation(),
 		(GetActorLocation() - DamageCauser->GetActorLocation()).GetSafeNormal()
 	);
+
+	ImpactNiagaraComop->SetActive(true);
 }
 
 void APNEnemyCommonBase::NextComboAttack()
-{
-}
-
-void APNEnemyCommonBase::FirstDetectPlayer()
 {
 }
 
@@ -80,6 +87,31 @@ void APNEnemyCommonBase::SetHpBar(UEnemyHpBarWidget* InHpBar)
 void APNEnemyCommonBase::SetDead()
 {
 	OnEnemyDead.ExecuteIfBound();
+
+	FTimerHandle Temp;
+	GetWorld()->GetTimerManager().SetTimer(Temp, [&]()
+		{
+			Destroy();
+		}, 7.f, false);
+}
+
+void APNEnemyCommonBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FVector Origin = GetActorLocation();
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(OverlapResults, Origin, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(800.f), Params);
+	if (bHit)
+	{
+		HpBarWidgetComponent->SetVisibility(true);
+	}
+	else
+	{
+		HpBarWidgetComponent->SetVisibility(false);
+	}
 }
 
 void APNEnemyCommonBase::DisplayDamageTextUI(float Damage)

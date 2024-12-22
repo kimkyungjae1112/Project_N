@@ -34,10 +34,11 @@ public:
 	FORCEINLINE float GetHp() const { return Hp; }
 	FORCEINLINE float GetMaxEnergy() const { return MaxEnergy; }
 	FORCEINLINE float GetEnergy() const { return Energy; }
+	FORCEINLINE void SetEnergyFlag() { bEnergyFlag = true; }
 
-	FORCEINLINE float UseLightAttackEnergy() const { return 10.f; }
-	FORCEINLINE float UseHeavyAttackEnergy() const { return 20.f; }
-	FORCEINLINE float UseDashAttackEnergy() const { return 15.f; }
+	FORCEINLINE float UseLightAttackEnergy() const { return 7.f; }
+	FORCEINLINE float UseHeavyAttackEnergy() const { return 12.f; }
+	FORCEINLINE float UseDashAttackEnergy() const { return 10.f; }
 	
 		
 public:
@@ -60,4 +61,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Stat")
 	float Energy;
 
+	bool bEnergyFlag = true;
 };

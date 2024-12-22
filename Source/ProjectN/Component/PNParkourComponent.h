@@ -42,10 +42,11 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
 	TObjectPtr<class UPNPlayerStatComponent> StatComp;
 
-	bool bIsRun = false;
 
 /* 몽타주 */
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> RollMontage;
+
+	bool bRollCooldown = false;
 };

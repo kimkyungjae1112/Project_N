@@ -22,7 +22,6 @@ public:
 
 	/* AI Interface */
 	virtual void NextComboAttack() override;
-	virtual void FirstDetectPlayer() override;
 
 	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
@@ -34,17 +33,22 @@ public:
 
 	static FOnEnemyDead OnEnemyDead;
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	TObjectPtr<class UNiagaraComponent> ImpactNiagaraComop;
+
+	UPROPERTY(VisibleAnywhere, Category = "Collision")
+	TObjectPtr<class USphereComponent> FirstDetectSphereComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TObjectPtr<class UEnemyRefWidgetComponent> HpBarWidgetComponent;
 
 private:
 	void DisplayDamageTextUI(float Damage);
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	TObjectPtr<class UEnemyRefWidgetComponent> HpBarWidgetComponent;
-
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<class UEnemyRefWidgetComponent> DamageTextWidgetComponent;
 

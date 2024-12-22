@@ -125,6 +125,8 @@ private:
 	/* Stun */
 	void EndStun(class UAnimMontage* Target, bool IsProperlyEnded);
 
+	void Init();
+
 /* UI */
 private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")

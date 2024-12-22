@@ -11,6 +11,7 @@
 #include "MotionWarpingComponent.h"
 #include "Component/PNPlayerStatComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/PNPlayerController.h"
 
 UPNBattleSystemComponent::UPNBattleSystemComponent()
 {
@@ -42,7 +43,8 @@ void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	DetectEnemyForAssassination();
+	//구현 취소
+	/*DetectEnemyForAssassination();
 	if (bCanAssassination)
 	{
 		if (AssassinationUI && !AssassinationUI->IsInViewport())
@@ -56,7 +58,7 @@ void UPNBattleSystemComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 		{
 			AssassinationUI->RemoveFromViewport();
 		}
-	}
+	}*/
 }
 
 void UPNBattleSystemComponent::Charge()
@@ -192,7 +194,7 @@ void UPNBattleSystemComponent::CheckTimerLightAttack()
 
 void UPNBattleSystemComponent::ChargeAttack()
 {
-	StatComp->ApplyEnergy(20.f);
+	StatComp->ApplyEnergy(15.f);
 	Anim->Montage_Play(ChargeAttackMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -219,7 +221,7 @@ void UPNBattleSystemComponent::BeginAssassinationAttack()
 {
 	if (!bCanAssassination) return;
 
-	StatComp->ApplyEnergy(25.f);
+	StatComp->ApplyEnergy(20.f);
 	AssassinationMotionWarpSet();
 	Anim->Montage_Play(AssassinationMontage);
 }
@@ -242,6 +244,7 @@ void UPNBattleSystemComponent::BeginBlockAttacked()
 {
 	StatComp->ApplyEnergy(5.f);
 	Anim->Montage_Play(BlockAttackedMontage);
+	Init();
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndBlockAttacked);
@@ -252,6 +255,7 @@ void UPNBattleSystemComponent::BeginAttacked()
 {
 	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	Anim->Montage_Play(AttackedMontage);
+	Init();
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &UPNBattleSystemComponent::EndAttacked);
@@ -260,6 +264,7 @@ void UPNBattleSystemComponent::BeginAttacked()
 
 void UPNBattleSystemComponent::BeginKnockBackAttacked()
 {
+	Init();
 	Anim->Montage_Play(KnockBackMontage);
 }
 
@@ -291,8 +296,7 @@ void UPNBattleSystemComponent::BeginChangeNonCombat()
 void UPNBattleSystemComponent::BeginStun()
 {
 	if (Anim->Montage_IsPlaying(StunMontage)) return;
-	UE_LOG(LogTemp, Display, TEXT("스턴 실행"));
-	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	Player->EnableInput(Cast<APNPlayerController>(GetWorld()->GetFirstPlayerController()));
 	Anim->Montage_Play(StunMontage);
 
 	FOnMontageEnded MontageEnd;
@@ -323,7 +327,6 @@ void UPNBattleSystemComponent::DetectEnemyForAssassination()
 		FVector PlayerForward = Player->GetActorForwardVector();
 
 
-		//구현 보류 잘 안됨 지금 2024 12 03
 		double CosineValue = FMath::Cos(FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(TargetForward, PlayerForward))));
 		if (CosineValue > 0.f && CosineValue <= 1.f)
 		{
@@ -428,6 +431,14 @@ void UPNBattleSystemComponent::EndChangeNonCombat(UAnimMontage* Target, bool IsP
 
 void UPNBattleSystemComponent::EndStun(UAnimMontage* Target, bool IsProperlyEnded)
 {
-	Player->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	StatComp->ApplyEnergy(StatComp->GetMaxEnergy());
+	StatComp->SetEnergyFlag();
+	Player->EnableInput(Cast<APNPlayerController>(GetWorld()->GetFirstPlayerController()));
+}
+
+void UPNBattleSystemComponent::Init()
+{
+	CurrentAttackState = EAttackState::ASIdle;
+	CurrentLightAttackCombo = 0;
+	CurrentHeavyAttackCombo = 0;
+
 }

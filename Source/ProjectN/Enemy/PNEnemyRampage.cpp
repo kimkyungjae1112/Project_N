@@ -65,6 +65,7 @@ void APNEnemyRampage::ApplyDamage(float DamageAmount, AActor* DamageCauser, cons
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
+	BeginHurt();
 	StatComp->ApplyDamage(DamageAmount);
 }
 
@@ -106,4 +107,19 @@ void APNEnemyRampage::EndDefaultAttack(UAnimMontage* Target, bool IsProperlyEnde
 {
 	DefaultAttackCombo = 0;
 	OnAttack_1_Finished.ExecuteIfBound();
+}
+
+void APNEnemyRampage::BeginHurt()
+{
+	GetMyController()->StopAI();
+	Anim->Montage_Play(HitMontage);
+
+	FOnMontageEnded MontageEnd;
+	MontageEnd.BindUObject(this, &APNEnemyRampage::EndHurt);
+	Anim->Montage_SetEndDelegate(MontageEnd, HitMontage);
+}
+
+void APNEnemyRampage::EndHurt(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	GetMyController()->RunAI();
 }

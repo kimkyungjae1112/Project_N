@@ -14,6 +14,8 @@
 #include "Component/PNPlayerStatComponent.h"
 #include "MotionWarpingComponent.h"
 #include "UI/PlayerHUDWidget.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 
 APNCharacter::APNCharacter()
 {
@@ -285,7 +287,13 @@ void APNCharacter::SetBehaviorStateNonCombat()
 
 void APNCharacter::SetDead()
 {
+	DisableInput(GetMyController());
 
+	UAnimInstance* Anim = GetMesh()->GetAnimInstance();
+
+	Anim->Montage_Play(DeadMontage);
+
+	GetMyController()->GameHasEnded();
 }
 
 void APNCharacter::SetStun()

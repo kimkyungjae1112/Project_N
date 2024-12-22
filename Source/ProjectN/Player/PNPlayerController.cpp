@@ -13,6 +13,14 @@ APNPlayerController::APNPlayerController()
 	}
 }
 
+void APNPlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
+{
+	Super::GameHasEnded(EndGameFocus, bIsWinner);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &APNPlayerController::RestartLevel, 5.f, false);
+}
+
 void APNPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

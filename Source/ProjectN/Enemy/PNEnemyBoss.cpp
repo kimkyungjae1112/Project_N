@@ -10,6 +10,10 @@
 #include "UI/BossStatusWidget.h"
 #include "Engine/DamageEvents.h"
 #include "Interface/PlayerApplyDamageInterface.h"
+#include "Projectile/BossProtectileRanged2.h"
+#include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/OverlapResult.h"
 
 APNEnemyBoss::APNEnemyBoss()
 {
@@ -29,6 +33,11 @@ APNEnemyBoss::APNEnemyBoss()
 		SwordMeshComp->SetSkeletalMesh(SwordMeshRef.Object);
 	}
 
+	NiagaraComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara Component"));
+	NiagaraComp->SetupAttachment(SwordMeshComp);
+	NiagaraComp->bAutoActivate = false;
+	//NiagaraComp->SetRelativeScale3D(FVector(0.5f))
+
 	MotionWarpComp = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion Warping Component"));
 	StatComp->OnHpZero.AddUObject(this, &APNEnemyBoss::SetDead);
 
@@ -41,24 +50,19 @@ APNEnemyBoss::APNEnemyBoss()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
-void APNEnemyBoss::TestStart()
-{
-	GetMyController()->RunAI();
-}
-
 void APNEnemyBoss::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetMyController()->StopAI();
+
 	Anim = GetMesh()->GetAnimInstance();
 	ensure(Anim);
-
-	GetMyController()->StopAI();
 }
 
 float APNEnemyBoss::GetMeleeAttackInRange()
 {
-	return 400.0f;
+	return 500.0f;
 }
 
 void APNEnemyBoss::Attack_1()
@@ -165,6 +169,11 @@ void APNEnemyBoss::StartMotion()
 	BeginStartMotion();
 }
 
+void APNEnemyBoss::SetMoveFlag()
+{
+	GetMyController()->SetMoveFlag();
+}
+
 void APNEnemyBoss::BeginMeleeAttack_1()
 {
 	Attack_1_Combo = 1;
@@ -182,6 +191,7 @@ void APNEnemyBoss::EndMeleeAttack_1(UAnimMontage* Target, bool IsProperlyEnded)
 
 void APNEnemyBoss::BeginMeleeAttack_2()
 {
+	NiagaraComp->SetActive(true);
 	Anim->Montage_Play(MeleeAttack_2_Montage);
 
 	FOnMontageEnded MontageEnd;
@@ -251,6 +261,7 @@ void APNEnemyBoss::BeginMeleeAttack_4()
 {
 	Attack_4_MotionWarpSet();
 	Anim->Montage_Play(MeleeAttack_4_Montage);
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Attack4"));
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &APNEnemyBoss::EndMeleeAttack_4);
@@ -259,6 +270,7 @@ void APNEnemyBoss::BeginMeleeAttack_4()
 
 void APNEnemyBoss::EndMeleeAttack_4(UAnimMontage* Target, bool IsProperlyEnded)
 {
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
 	OnAttack_4_Finished.ExecuteIfBound();
 }
 
@@ -307,6 +319,23 @@ void APNEnemyBoss::EndRangedAttack_1(UAnimMontage* Target, bool IsProperlyEnded)
 
 void APNEnemyBoss::Attack_5_HitCheck()
 {
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Attack_5_Effect, GetActorLocation() + GetActorForwardVector() * 300.f - FVector(0.f, 0.f, 30.f));
+
+	FVector Origin = GetActorLocation();
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams Params(NAME_None, false, this);
+
+	bool bHit = GetWorld()->OverlapMultiByChannel(OverlapResults, Origin, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(300.f), Params);
+	if (bHit)
+	{
+		for (const FOverlapResult& HitResult : OverlapResults)
+		{
+			AActor* Target = HitResult.GetActor();
+			FDamageEvent DamageEvent;
+			Target->TakeDamage(500.f, DamageEvent, GetMyController(), this);
+		}
+	}
 }
 
 void APNEnemyBoss::BeginRangedAttack_2()
@@ -325,6 +354,11 @@ void APNEnemyBoss::EndRangedAttack_2(UAnimMontage* Target, bool IsProperlyEnded)
 
 void APNEnemyBoss::Attack_6_HitCheck()
 {
+	ABossProtectileRanged2* Projectile = GetWorld()->SpawnActor<ABossProtectileRanged2>(RangedSkill_2_Class, GetActorLocation() + FVector(100.f, 0.f, 50.f), GetActorForwardVector().Rotation());
+	if (Projectile)
+	{
+		Projectile->Init(GetActorForwardVector(), GetMyController());
+	}
 }
 
 void APNEnemyBoss::BeginStartMotion()

@@ -35,22 +35,16 @@ void UPNParkourComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bIsRun)
-	{
-		StatComp->ApplyEnergy(0.1f);
-	}
 }
 
 void UPNParkourComponent::Run()
 {
 	Character->GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	bIsRun = true;
 }
 
 void UPNParkourComponent::Walk()
 {
 	Character->GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	bIsRun = false;
 }
 
 void UPNParkourComponent::Crouch()
@@ -71,10 +65,13 @@ void UPNParkourComponent::UnCrouch()
 
 void UPNParkourComponent::BeginRoll()
 {
-	StatComp->ApplyEnergy(20.f);
+	if (bRollCooldown) return;
+
+	bRollCooldown = true;
+
 	RollMotionWarpSet();
 	Anim->Montage_Play(RollMontage);
-	//Character->GetCapsuleComponent()->SetCollisionProfileName(TEXT("NoCollision"));
+	StatComp->ApplyEnergy(15.f);
 
 	FOnMontageEnded MontageEnd;
 	MontageEnd.BindUObject(this, &UPNParkourComponent::EndRoll);
@@ -83,7 +80,7 @@ void UPNParkourComponent::BeginRoll()
 
 void UPNParkourComponent::EndRoll(UAnimMontage* Target, bool IsProperlyEnded)
 {
-	//Character->GetCapsuleComponent()->SetCollisionProfileName(TEXT("Player"));
+	bRollCooldown = false;
 }
 
 void UPNParkourComponent::RollMotionWarpSet()

@@ -11,11 +11,10 @@ UGameManagerSubsystem::UGameManagerSubsystem()
 
 void UGameManagerSubsystem::DeadCountEnemy()
 {
-	UE_LOG(LogTemp, Display, TEXT("싱글톤"));
 	DeadCountEnemyNum++;
 	OnEnemyDeadSign.ExecuteIfBound();
 
-	if (DeadCountEnemyNum >= 2)
+	if (DeadCountEnemyNum >= 10)
 	{
 		OnCompleteStageSign.Broadcast();
 	}

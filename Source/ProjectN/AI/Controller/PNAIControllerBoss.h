@@ -16,7 +16,8 @@ class PROJECTN_API APNAIControllerBoss : public APNAIControllerBase
 
 public:
 	APNAIControllerBoss();
-	
+	FORCEINLINE void SetMoveFlag() { bMoveFlag = true; }
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -25,4 +26,5 @@ public:
 	
 private:
 	float Interval = 0.f;
+	bool bMoveFlag = false;
 };

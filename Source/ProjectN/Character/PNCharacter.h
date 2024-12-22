@@ -187,5 +187,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<class UPlayerHUDWidget> HUDWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> DeadMontage;
 
 };

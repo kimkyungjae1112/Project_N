@@ -24,9 +24,9 @@ void UPNPlayerStatComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (Energy < MaxEnergy - KINDA_SMALL_NUMBER)
+	if (Energy < MaxEnergy - KINDA_SMALL_NUMBER && bEnergyFlag)
 	{
-		float PrevEnergy = FMath::Clamp(Energy + DeltaTime * 5.f, 0, MaxEnergy);
+		float PrevEnergy = FMath::Clamp(Energy + DeltaTime * 6.f, 0, MaxEnergy);
 		SetEnergy(PrevEnergy);
 	}
 }
@@ -45,6 +45,8 @@ void UPNPlayerStatComponent::ApplyDamage(float InDamage)
 
 void UPNPlayerStatComponent::ApplyEnergy(float InEnergy)
 {
+	if (!bEnergyFlag) return;
+
 	float ActualEnergy = FMath::Clamp(InEnergy, 0, InEnergy);
 	float PrevEnergy = Energy;
 
@@ -52,8 +54,8 @@ void UPNPlayerStatComponent::ApplyEnergy(float InEnergy)
 	if (Energy < KINDA_SMALL_NUMBER)
 	{
 		UE_LOG(LogTemp, Display, TEXT("신호날리기"));
-
-		//OnEnergyZero.Broadcast();
+		bEnergyFlag = false;
+		OnEnergyZero.Broadcast();
 	}
 }
 

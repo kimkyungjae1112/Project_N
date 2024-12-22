@@ -19,8 +19,6 @@ class PROJECTN_API APNEnemyBoss : public APNEnemyBase, public IWeaponSocketCarry
 public:
 	APNEnemyBoss();
 
-	UFUNCTION(BlueprintCallable)
-	void TestStart();
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,6 +50,9 @@ public:
 
 	/* Start Motion */
 	void StartMotion();
+
+	void SetMoveFlag();
+
 
 /* 공격 */
 private:
@@ -93,7 +94,7 @@ private:
 /* 유틸 */
 private:
 	class APNAIControllerBoss* GetMyController();
-
+	bool bMoveFlag = false;
 /* 몽타주 섹션 */
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Animation")
@@ -131,6 +132,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "MotionWarp")
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Niagara")
+	TObjectPtr<class UNiagaraComponent> NiagaraComp;
+
 /* UI */
 private:
 	UPROPERTY(EditAnywhere, Category = "UI")
@@ -139,4 +143,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TObjectPtr<class UBossStatusWidget> BossStatusPtr;
 
+/* Effect */
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	TObjectPtr<class UParticleSystem> Attack_5_Effect;
+
+/* 스킬 */
+private:
+	UPROPERTY(EditAnywhere, Category = "Skill")
+	TSubclassOf<class ABossProtectileRanged2> RangedSkill_2_Class;
 };

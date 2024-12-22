@@ -9,6 +9,8 @@
 #include "Animation/AnimMontage.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Components/SphereComponent.h"
+#include "UI/EnemyRefWidgetComponent.h"
 
 APNEnemySkeleton::APNEnemySkeleton()
 {
@@ -26,10 +28,13 @@ APNEnemySkeleton::APNEnemySkeleton()
 		WeaponMeshComp->SetSkeletalMesh (WeaponMesh_3_Ref.Object);
 	}
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("EnemyInit"));
 	GetCharacterMovement()->MaxWalkSpeed = 150.f;
 
 	DefaultAttackCombo = 0;
+	
+	FirstDetectSphereComp->OnComponentBeginOverlap.AddDynamic(this, &APNEnemySkeleton::BeginFirstDetectPlayer);
+	HpBarWidgetComponent->SetVisibility(false);
 }
 
 float APNEnemySkeleton::GetMeleeAttackInRange()
@@ -61,16 +66,6 @@ APNAIControllerBase* APNEnemySkeleton::GetAIController()
 
 void APNEnemySkeleton::NextComboAttack()
 {
-}
-
-void APNEnemySkeleton::FirstDetectPlayer()
-{
-	UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
-	if (PNAnim)
-	{
-		PNAnim->bIsDetectPlayer = true;
-		PNAnim->Montage_Play(CurrentWeaponMontages[4]);
-	}
 }
 
 void APNEnemySkeleton::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
@@ -111,6 +106,8 @@ void APNEnemySkeleton::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetMyController()->StopAI();
+
 	Anim = GetMesh()->GetAnimInstance();
 
 	switch (WeaponType)
@@ -130,6 +127,29 @@ void APNEnemySkeleton::BeginPlay()
 APNAIControllerSkeleton* APNEnemySkeleton::GetMyController()
 {
 	return CastChecked<APNAIControllerSkeleton>(GetController());
+}
+
+void APNEnemySkeleton::BeginFirstDetectPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->ActorHasTag(TEXT("Player")))
+	{
+		Anim->Montage_Play(CurrentWeaponMontages[4]);
+		FirstDetectSphereComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		FOnMontageEnded MontageEnd;
+		MontageEnd.BindUObject(this, &APNEnemySkeleton::EndFirstDetectPlayer);
+		Anim->Montage_SetEndDelegate(MontageEnd, CurrentWeaponMontages[4]);
+
+		UPNAnimInstance* PNAnim = Cast<UPNAnimInstance>(Anim);
+		PNAnim->bIsDetectPlayer = true;
+	}
+}
+
+void APNEnemySkeleton::EndFirstDetectPlayer(UAnimMontage* Target, bool IsProperlyEnded)
+{
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Enemy"));
+	HpBarWidgetComponent->SetVisibility(true);
+	GetMyController()->RunAI();
 }
 
 void APNEnemySkeleton::BeginDefaultAttack()

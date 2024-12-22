@@ -10,6 +10,7 @@
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
 #include "Game/GameManagerSubsystem.h"
+#include "Player/PNPlayerController.h"
 
 APNActiveBoss::APNActiveBoss()
 {
@@ -44,12 +45,26 @@ void APNActiveBoss::BeginPlay()
 		);
 	}
 
+	if (LevelSequencePlayer)
+	{
+		LevelSequencePlayer->OnFinished.AddDynamic(this, &APNActiveBoss::OnSequenceFinished);
+	}
 
 	GetGameInstance()->GetSubsystem<UGameManagerSubsystem>()->OnCompleteStageSign.AddUObject(this, &APNActiveBoss::ActiveStage);
 }
 
 void APNActiveBoss::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	APNPlayerController* Controller = Cast<APNPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (Controller)
+	{
+		APawn* ControlledPawn = Controller->GetPawn();
+		if (ControlledPawn)
+		{
+			ControlledPawn->DisableInput(Controller);
+		}
+	}
+
 	APNThrone* Throne = Cast<APNThrone>(UGameplayStatics::GetActorOfClass(GetWorld(), APNThrone::StaticClass()));
 	if (Throne)
 	{
@@ -59,14 +74,28 @@ void APNActiveBoss::OnComponentOverlap(UPrimitiveComponent* OverlappedComponent,
 	APNEnemyBoss* BossPtr = Cast<APNEnemyBoss>(UGameplayStatics::GetActorOfClass(GetWorld(), APNEnemyBoss::StaticClass()));
 	if (BossPtr)
 	{
-		//BossPtr->DisplayStatus();
-
 		FTimerHandle StartMotionTimer;
 		GetWorld()->GetTimerManager().SetTimer(StartMotionTimer, BossPtr, &APNEnemyBoss::StartMotion, 10.f, false);
-		//BossPtr->StartMotion();
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, BossPtr, &APNEnemyBoss::SetMoveFlag, 20.f, false);
 	}
 
 	LevelSequencePlayer->Play();
+}
+
+void APNActiveBoss::OnSequenceFinished()
+{
+	APNPlayerController* Controller = Cast<APNPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (Controller)
+	{
+		APawn* ControlledPawn = Controller->GetPawn();
+		if (ControlledPawn)
+		{
+			ControlledPawn->EnableInput(Controller);
+		}
+	}
+
 }
 
 void APNActiveBoss::ActiveStage()

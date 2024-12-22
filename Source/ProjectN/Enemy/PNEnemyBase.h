@@ -43,7 +43,6 @@ public:
 	virtual class APNAIControllerBase* GetAIController() override;
 	
 	virtual void NextComboAttack() override;
-	virtual void FirstDetectPlayer() override {};
 
 	/* EnemyApplyDamage Interface */
 	virtual void ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation) override;
@@ -61,4 +60,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Stat")
 	TObjectPtr<class UPNEnemyStatComponent> StatComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Sound")
+	TArray<class USoundCue*> HitSounds;
 };

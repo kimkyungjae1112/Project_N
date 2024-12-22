@@ -17,6 +17,8 @@ class PROJECTN_API APNPlayerController : public APlayerController
 public:
 	APNPlayerController();
 
+	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -47,6 +47,9 @@ private:
 	void BeginDefaultAttack();
 	void EndDefaultAttack(class UAnimMontage* Target, bool IsProperlyEnded);
 
+	void BeginHurt();
+	void EndHurt(class UAnimMontage* Target, bool IsProperlyEnded);
+
 /* 공격 관련 데이터 */
 private:
 	uint8 DefaultAttackCombo;
@@ -58,4 +61,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Montage")
 	TObjectPtr<class UAnimMontage> DeadMontage;
+	
+	UPROPERTY(EditAnywhere, Category = "Montage")
+	TObjectPtr<class UAnimMontage> HitMontage;
 };

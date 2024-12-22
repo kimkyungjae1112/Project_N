@@ -99,7 +99,6 @@ void APNAIControllerSkeleton::HandleSenseSight(AActor* Actor, const FAIStimulus&
 {
 	if (AIStimulus.WasSuccessfullySensed())
 	{
-		GetBlackboardComponent()->SetValueAsBool(TEXT("IsDetect"), true);
 		GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Actor);
 	}
 	else

@@ -34,7 +34,7 @@ void APNAIControllerBoss::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	APawn* Target = Cast<APawn>(GetBlackboardComponent()->GetValueAsObject(TEXT("Target")));
-	if (Target)
+	if (Target && bMoveFlag)
 	{
 		FRotator TargetRotation = (Target->GetActorLocation() - GetPawn()->GetActorLocation()).Rotation();
 		TargetRotation.Roll = 0;
@@ -49,7 +49,7 @@ void APNAIControllerBoss::Tick(float DeltaTime)
 			MoveToLocation(TargetLocation);
 			Interval = 0.f;
 		}
-		GetPawn()->SetActorRotation(TargetRotation);
+		//GetPawn()->SetActorRotation(TargetRotation);
 	}
 }
 

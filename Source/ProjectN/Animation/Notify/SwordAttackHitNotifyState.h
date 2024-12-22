@@ -31,4 +31,10 @@ private:
 	
 	float Damage;
 	FName DamageType;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class USoundCue> ImpactSound;
+
+	UPROPERTY()
+	TObjectPtr<class USoundCue> AttackSound;
 };

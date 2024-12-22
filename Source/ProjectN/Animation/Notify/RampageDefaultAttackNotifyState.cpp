@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Engine/OverlapResult.h"
 #include "Interface/AIInterface.h"
+#include "Engine/DamageEvents.h"
+#include "AI/Controller/PNAIControllerBase.h"
 
 URampageDefaultAttackNotifyState::URampageDefaultAttackNotifyState()
 {
@@ -64,7 +66,15 @@ void URampageDefaultAttackNotifyState::MakeSphereTrace(ACharacter* Character)
 	{
 		HitTarget.Add(HitResult.GetActor());
 
-		DrawDebugSphere(Character->GetWorld(), HitResult.ImpactPoint, 16.f, 32, FColor::Green, false, 3.f);
+		FDamageEvent DamageEvent;
+		IAIInterface* Interface = Cast<IAIInterface>(Character);
+		if (Interface)
+		{
+			if (HitResult.GetActor())
+			{
+				HitResult.GetActor()->TakeDamage(300.f, DamageEvent, Interface->GetAIController(), Character);
+			}
+		}
 	}
 }
 

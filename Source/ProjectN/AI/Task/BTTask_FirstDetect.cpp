@@ -18,11 +18,7 @@ EBTNodeResult::Type UBTTask_FirstDetect::ExecuteTask(UBehaviorTreeComponent& Own
 	APawn* Owner = OwnerComp.GetAIOwner()->GetPawn();
 	if (Owner == nullptr) return EBTNodeResult::Failed;
 
-	IAIInterface* Interface = Cast<IAIInterface>(Owner);
-	if (Interface)
-	{
-		Interface->FirstDetectPlayer();
-	}
+	
 
 	return EBTNodeResult::Succeeded;
 }

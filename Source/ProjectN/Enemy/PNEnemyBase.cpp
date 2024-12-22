@@ -3,11 +3,39 @@
 
 #include "Enemy/PNEnemyBase.h"
 #include "AI/Controller/PNAIControllerBase.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 APNEnemyBase::APNEnemyBase()
 {
 	StatComp = CreateDefaultSubobject<UPNEnemyStatComponent>(TEXT("Stat Component"));
 	StatComp->OnHpZero.AddUObject(this, &APNEnemyBase::SetDead);
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSound1Ref(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_01_Cue.Metallic_Impact_Sword_Attack_With_Blood_01_Cue'"));
+	if (HitSound1Ref.Object)
+	{
+		HitSounds.Add(HitSound1Ref.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSound2Ref(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_02_Cue.Metallic_Impact_Sword_Attack_With_Blood_02_Cue'"));
+	if (HitSound2Ref.Object)
+	{
+		HitSounds.Add(HitSound2Ref.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSound3Ref(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_03_Cue.Metallic_Impact_Sword_Attack_With_Blood_03_Cue'"));
+	if (HitSound3Ref.Object)
+	{
+		HitSounds.Add(HitSound3Ref.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSound4Ref(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_04_Cue.Metallic_Impact_Sword_Attack_With_Blood_04_Cue'"));
+	if (HitSound4Ref.Object)
+	{
+		HitSounds.Add(HitSound4Ref.Object);
+	}
+	static ConstructorHelpers::FObjectFinder<USoundCue> HitSound5Ref(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_05_Cue.Metallic_Impact_Sword_Attack_With_Blood_05_Cue'"));
+	if (HitSound5Ref.Object)
+	{
+		HitSounds.Add(HitSound5Ref.Object);
+	}
 }
 
 float APNEnemyBase::GetMeleeAttackInRange()
@@ -85,6 +113,8 @@ void APNEnemyBase::NextComboAttack()
 
 void APNEnemyBase::ApplyDamage(float DamageAmount, AActor* DamageCauser, const FName& DamageType, const FVector& ImpactLocation)
 {
+	int32 Index = FMath::RandRange(0, 4);
+	UGameplayStatics::PlaySoundAtLocation(this, HitSounds[Index], ImpactLocation);
 }
 
 void APNEnemyBase::SetDead()
