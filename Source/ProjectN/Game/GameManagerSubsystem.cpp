@@ -14,7 +14,7 @@ void UGameManagerSubsystem::DeadCountEnemy()
 	DeadCountEnemyNum++;
 	OnEnemyDeadSign.ExecuteIfBound();
 
-	if (DeadCountEnemyNum >= 10)
+	if (DeadCountEnemyNum >= 5)
 	{
 		OnCompleteStageSign.Broadcast();
 	}

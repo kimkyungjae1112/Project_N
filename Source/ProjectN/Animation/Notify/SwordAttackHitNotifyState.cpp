@@ -4,24 +4,12 @@
 #include "Animation/Notify/SwordAttackHitNotifyState.h"
 #include "Interface/EnemyApplyDamageInterface.h"
 #include "Interface/WeaponSocketCarryInterface.h"
-#include "Sound/SoundCue.h"
-#include "Kismet/GameplayStatics.h"
 
 USwordAttackHitNotifyState::USwordAttackHitNotifyState()
 {
 	Damage = 0.f;
 	DamageType = TEXT("");
 
-	static ConstructorHelpers::FObjectFinder<USoundCue> ImpactSoundRef(TEXT("/Script/Engine.SoundCue'/Game/Project_N/Sound/Metallic_Impact_Sword_Attack_With_Blood_05_Cue.Metallic_Impact_Sword_Attack_With_Blood_05_Cue'"));
-	if (ImpactSoundRef.Object)
-	{
-		ImpactSound = ImpactSoundRef.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<USoundCue> AttackSoundRef(TEXT("/Script/Engine.SoundWave'/Game/No-Face/SkillSound/Sword/Default/SwordDefault_01.SwordDefault_01'"));
-	if (AttackSoundRef.Object)
-	{
-		AttackSound = AttackSoundRef.Object;
-	}
 }
 
 void USwordAttackHitNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
@@ -94,13 +82,12 @@ void USwordAttackHitNotifyState::MakeLineTrace(AActor* Owner)
 			bool bHit = Owner->GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel2, Params);
 			if (bHit && !HitEnemys.Contains(HitResult.GetActor()))
 			{
-				DrawDebugSphere(Owner->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
+				//DrawDebugSphere(Owner->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
 				HitEnemys.Add(HitResult.GetActor());
 
 				if (IEnemyApplyDamageInterface* Enemy = Cast<IEnemyApplyDamageInterface>(HitResult.GetActor()))
 				{
 					Enemy->ApplyDamage(Damage, Owner, DamageType, HitResult.ImpactPoint);
-					UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, HitResult.ImpactPoint);
 					return;
 				}
 			}

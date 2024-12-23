@@ -235,11 +235,11 @@ void APNEnemyBoss::Attack_3_HitCheck()
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
 
-	DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f);
-	DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f);
+	//DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f);
+	//DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f);
 
-	// 히트 경로를 선으로 디버깅
-	DrawDebugLine(GetWorld(), Origin, End, FColor::Blue, false, 1.f, 0, 2.f);
+	//// 히트 경로를 선으로 디버깅
+	//DrawDebugLine(GetWorld(), Origin, End, FColor::Blue, false, 1.f, 0, 2.f);
 
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
 	if (bHit)
@@ -291,8 +291,8 @@ void APNEnemyBoss::Attack_4_HitCheck()
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this);
 	
-	DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f); // 시작 위치
-	DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f); // 끝 위치
+	//DrawDebugBox(GetWorld(), Origin, BoxExtent, FQuat::Identity, FColor::Red, false, 1.f); // 시작 위치
+	//DrawDebugBox(GetWorld(), End, BoxExtent, FQuat::Identity, FColor::Green, false, 1.f); // 끝 위치
 
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, Origin, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeBox(BoxExtent), Params);
 	if (bHit)

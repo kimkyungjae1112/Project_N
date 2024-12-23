@@ -45,7 +45,7 @@ void USkeletonDefaultAttackNotifyState::MakeLineTrace(AActor* Target)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params(NAME_None, true, Target);
-			DrawDebugLine(Target->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
+			//DrawDebugLine(Target->GetWorld(), StartLoc, EndLoc, FColor::Red, false, 2.f);
 
 			bool bHit = Target->GetWorld()->LineTraceSingleByChannel(HitResult, StartLoc, EndLoc, ECC_GameTraceChannel1, Params);
 			if (bHit && !HitTarget.Contains(HitResult.GetActor()))
@@ -54,7 +54,7 @@ void USkeletonDefaultAttackNotifyState::MakeLineTrace(AActor* Target)
 
 				FDamageEvent DamageEvent;
 				HitResult.GetActor()->TakeDamage(100.f, DamageEvent, AIInteface->GetAIController(), Target);
-				DrawDebugSphere(Target->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
+				//DrawDebugSphere(Target->GetWorld(), HitResult.ImpactPoint, 12.f, 32, FColor::Green, false, 3.f);
 			}
 		}
 	}

@@ -59,7 +59,7 @@ void UBossDefaultAttackNotifyState::MakeLineTrace(AActor* Owner)
 
 			FHitResult HitResult;
 			FCollisionQueryParams Params(NAME_None, true, Owner);
-			DrawDebugLine(Owner->GetWorld(), StartBone, EndBone, FColor::Red, false, 2.f);
+			//DrawDebugLine(Owner->GetWorld(), StartBone, EndBone, FColor::Red, false, 2.f);
 
 
 			bool bHit = Owner->GetWorld()->LineTraceSingleByChannel(HitResult, StartBone, EndBone, ECC_GameTraceChannel1, Params);
