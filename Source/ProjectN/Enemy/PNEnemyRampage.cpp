@@ -65,10 +65,11 @@ void APNEnemyRampage::ApplyDamage(float DamageAmount, AActor* DamageCauser, cons
 {
 	Super::ApplyDamage(DamageAmount, DamageCauser, DamageType, ImpactLocation);
 
-	if (!Anim->Montage_IsPlaying(DefaultAttackMontage))
+	// 슈퍼 아머
+	/*if (!Anim->Montage_IsPlaying(DefaultAttackMontage) && !Anim->Montage_IsPlaying(DeadMontage))
 	{
 		BeginHurt();
-	}
+	}*/
 
 
 	StatComp->ApplyDamage(DamageAmount);
