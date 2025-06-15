@@ -1,4 +1,4 @@
-# Project N 🎮  
+# Project N   
 언리얼 엔진 5 + C++ 기반 개인 프로젝트 **소울라이크**  
 <br><br>
 
