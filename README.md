@@ -4,14 +4,13 @@
 
 ## 프로젝트 개요
 
-| 항목 | 내용 |
-|------|------|
-| **장르** | 소울라이크 |
-| **플랫폼** | Windows (PC) |
-| **엔진 / 언어** | Unreal Engine&nbsp;5 · C++ |
-| **개발 기간** | 2024-11-17 ~ 2024-12-23 |
-| **팀 규모** | 개인 |
-| **시연 영상** | [시연 영상](https://drive.google.com/file/d/16cSb3JgFYUaeaxbVX6jHcfQzHpt080LG/view?usp=sharing) |
+* 프로젝트 이름 : Project N
+* 장르 : 소울라이크
+* 플랫폼 : Windows (PC)
+* 엔진 : Unreal Engine 5.4
+* 제작 기간 : 2024.11.17 ~ 2024.12.23
+* 개발 인원 : 1인
+* 시연 영상 : [시연 영상](https://drive.google.com/file/d/16cSb3JgFYUaeaxbVX6jHcfQzHpt080LG/view?usp=sharing)
 
 <br><br>
 
